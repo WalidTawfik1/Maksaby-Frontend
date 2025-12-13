@@ -38,11 +38,20 @@ export interface ProductFormData {
 export interface Customer {
   id: string
   name: string
-  phone?: string
-  email?: string
-  address?: string
+  phone: string
+  email?: string | null
+  address: string
   totalSpent: number
   createdAt: string
+}
+
+// Form data for creating/updating customers
+export interface CustomerFormData {
+  name: string
+  phone: string
+  email?: string
+  address: string
+  id?: string // Only for update
 }
 
 export interface OrderItem {

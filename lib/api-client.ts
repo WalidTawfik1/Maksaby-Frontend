@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { ApiResponse, Product, ProductFormData } from '@/types'
+import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData } from '@/types'
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -140,6 +140,84 @@ export const updateProduct = async (data: ProductFormData) => {
  */
 export const deleteProduct = async (productId: string) => {
   const response = await apiClient.delete<ApiResponse<boolean>>(`/Product/${productId}`)
+  return response.data
+}
+
+// ==========================
+// Customer API Functions
+// ==========================
+
+interface GetAllCustomersParams {
+  pageNum?: number
+  pageSize?: number
+  searchTerm?: string
+}
+
+/**
+ * Get all customers with pagination and search
+ */
+export const getAllCustomers = async (params: GetAllCustomersParams = {}) => {
+  const { pageNum = 1, pageSize = 50, searchTerm = '' } = params
+  
+  const response = await apiClient.get<ApiResponse<Customer[]>>('/Customer/getallcustomers', {
+    params: {
+      pagenum: pageNum,
+      pagesize: pageSize,
+      SearchTerm: searchTerm,
+    },
+  })
+  
+  return response.data
+}
+
+/**
+ * Get a single customer by ID
+ */
+export const getCustomerById = async (customerId: string) => {
+  const response = await apiClient.get<ApiResponse<Customer>>(`/Customer/${customerId}`)
+  return response.data
+}
+
+/**
+ * Add a new customer
+ */
+export const addCustomer = async (data: CustomerFormData) => {
+  const payload = {
+    name: data.name,
+    phone: data.phone,
+    email: data.email || undefined,
+    address: data.address,
+  }
+  
+  const response = await apiClient.post<ApiResponse<Customer>>('/Customer/addcustomer', payload)
+  return response.data
+}
+
+/**
+ * Update an existing customer
+ */
+export const updateCustomer = async (data: CustomerFormData) => {
+  if (!data.id) {
+    throw new Error('Customer ID is required for update')
+  }
+  
+  const payload = {
+    id: data.id,
+    name: data.name,
+    phone: data.phone,
+    email: data.email || undefined,
+    address: data.address,
+  }
+  
+  const response = await apiClient.patch<ApiResponse<boolean>>('/Customer/updatecustomer', payload)
+  return response.data
+}
+
+/**
+ * Delete a customer
+ */
+export const deleteCustomer = async (customerId: string) => {
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/Customer/${customerId}`)
   return response.data
 }
 

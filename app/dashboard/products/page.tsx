@@ -7,17 +7,21 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ProductFormDialog } from '@/components/product-form-dialog'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { getAllProducts, deleteProduct as deleteProductApi } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
 import { Product } from '@/types'
 import toast from 'react-hot-toast'
 
 export default function ProductsPage() {
+  const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
   const queryClient = useQueryClient()
 
   // Fetch products with pagination and search
@@ -34,6 +38,17 @@ export default function ProductsPage() {
 
   const products = response?.data || []
 
+  const handleSearch = () => {
+    setSearchQuery(searchInput)
+    setCurrentPage(1)
+  }
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -41,7 +56,7 @@ export default function ProductsPage() {
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
-      toast.success(response.message)
+      toast.success('تم حذف المنتج بنجاح')
     },
     onError: (error: any) => {
       const errorMessage = error.response?.data?.message || 'فشل حذف المنتج'
@@ -60,9 +75,21 @@ export default function ProductsPage() {
   }
 
   const handleDeleteProduct = (product: Product) => {
-    if (confirm(`هل أنت متأكد من حذف المنتج "${product.name}"؟`)) {
-      deleteMutation.mutate(product.id)
+    setProductToDelete(product)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (productToDelete) {
+      deleteMutation.mutate(productToDelete.id)
+      setIsDeleteDialogOpen(false)
+      setProductToDelete(null)
     }
+  }
+
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false)
+    setProductToDelete(null)
   }
 
   const handleCloseForm = () => {
@@ -106,12 +133,10 @@ export default function ProductsPage() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="البحث عن منتج..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value)
-              setCurrentPage(1) // Reset to first page on search
-            }}
+            placeholder="البحث عن منتج... (اضغط Enter للبحث)"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyPress={handleSearchKeyPress}
             className="pr-10"
           />
         </div>
@@ -246,6 +271,18 @@ export default function ProductsPage() {
         product={selectedProduct}
         isOpen={isFormOpen}
         onClose={handleCloseForm}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        title="حذف المنتج"
+        message={`هل أنت متأكد من حذف المنتج "${productToDelete?.name}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        confirmText="حذف"
+        cancelText="إلغاء"
+        isLoading={deleteMutation.isPending}
       />
     </div>
   )

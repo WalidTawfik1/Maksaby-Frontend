@@ -64,7 +64,7 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
-      toast.success(response.message)
+      toast.success(product ? 'تم تحديث المنتج بنجاح' : 'تم إضافة المنتج بنجاح')
       onClose()
     },
     onError: (error: any) => {
@@ -209,7 +209,7 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
                 <div className="relative w-full h-40 border rounded-md overflow-hidden">
                   <img
                     src={imagePreview}
-                    alt="Preview"
+                    alt="معاينة الصورة"
                     className="w-full h-full object-cover"
                   />
                 </div>
