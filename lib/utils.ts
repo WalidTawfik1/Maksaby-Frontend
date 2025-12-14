@@ -16,17 +16,19 @@ export function formatDate(date: string | Date): string {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'Africa/Cairo',
   })
 }
 
 export function formatDateTime(date: string | Date): string {
   const d = typeof date === 'string' ? new Date(date) : date
-  return d.toLocaleDateString('ar-EG', {
+  return d.toLocaleString('ar-EG', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Africa/Cairo',
   })
 }
 

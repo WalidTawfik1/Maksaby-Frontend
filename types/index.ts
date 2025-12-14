@@ -195,3 +195,26 @@ export interface UpdateExpenseRequest {
   category?: string | null
   amount?: number
 }
+
+// Note types
+export interface Note {
+  id: string
+  customerId?: string | null
+  customerName?: string | null
+  content: string
+  isCompleted: boolean
+  completedAt?: string | null
+  createdAt: string
+}
+
+export interface CreateNoteRequest {
+  customerId?: string | null
+  content: string
+}
+
+export interface UpdateNoteRequest {
+  id: string
+  customerId?: string | null
+  content?: string
+  isCompleted?: boolean
+}

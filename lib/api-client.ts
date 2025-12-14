@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, CreateExpenseRequest, UpdateExpenseRequest } from '@/types'
+import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, CreateExpenseRequest, UpdateExpenseRequest, Note, CreateNoteRequest, UpdateNoteRequest } from '@/types'
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -427,5 +427,84 @@ export const updateExpense = async (data: UpdateExpenseRequest) => {
  */
 export const deleteExpense = async (expenseId: string) => {
   const response = await apiClient.delete<ApiResponse<boolean>>(`/Expense/${expenseId}`)
+  return response.data
+}
+
+// ==========================
+// Note API Functions
+// ==========================
+
+interface GetAllNotesParams {
+  pageNum?: number
+  pageSize?: number
+  searchTerm?: string | null
+  isCompleted?: boolean | null
+}
+
+/**
+ * Add a new note
+ */
+export const addNote = async (data: CreateNoteRequest) => {
+  const response = await apiClient.post<ApiResponse<Note>>('/Note/addnote', data)
+  return response.data
+}
+
+/**
+ * Get all notes with optional filters
+ */
+export const getAllNotes = async (params: GetAllNotesParams = {}) => {
+  const queryParams: any = {
+    pagenum: params.pageNum || 1,
+    pagesize: params.pageSize || 10,
+  }
+
+  if (params.searchTerm) queryParams.SearchTerm = params.searchTerm
+  if (params.isCompleted !== null && params.isCompleted !== undefined) {
+    queryParams.isCompleted = params.isCompleted
+  }
+
+  const response = await apiClient.get<ApiResponse<Note[]>>('/Note/getallnotes', {
+    params: queryParams,
+  })
+  return response.data
+}
+
+/**
+ * Get note by ID
+ */
+export const getNoteById = async (noteId: string) => {
+  const response = await apiClient.get<ApiResponse<Note>>(`/Note/${noteId}`)
+  return response.data
+}
+
+/**
+ * Get notes by customer ID
+ */
+export const getNotesByCustomerId = async (customerId: string) => {
+  const response = await apiClient.get<ApiResponse<Note[]>>(`/Note/customer/${customerId}`)
+  return response.data
+}
+
+/**
+ * Update an existing note
+ */
+export const updateNote = async (data: UpdateNoteRequest) => {
+  const response = await apiClient.patch<ApiResponse<boolean>>('/Note/updatenote', data)
+  return response.data
+}
+
+/**
+ * Toggle note completion status
+ */
+export const toggleNoteCompletion = async (noteId: string) => {
+  const response = await apiClient.patch<ApiResponse<Note>>(`/Note/${noteId}/toggle`)
+  return response.data
+}
+
+/**
+ * Delete a note
+ */
+export const deleteNote = async (noteId: string) => {
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/Note/${noteId}`)
   return response.data
 }

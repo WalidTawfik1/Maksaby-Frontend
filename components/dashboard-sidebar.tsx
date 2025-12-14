@@ -49,8 +49,8 @@ const navigationItems = [
     icon: Package2,
   },
   {
-    title: 'التقارير',
-    href: '/dashboard/reports',
+    title: 'الملاحظات',
+    href: '/dashboard/notes',
     icon: FileText,
   },
 ]

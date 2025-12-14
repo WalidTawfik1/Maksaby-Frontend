@@ -30,6 +30,16 @@ const apiMessageTranslations: Record<string, string> = {
   'Expense updated successfully.': 'تم تحديث المصروف بنجاح',
   'Expense deleted successfully.': 'تم حذف المصروف بنجاح',
   'Expense not found': 'المصروف غير موجود',
+  
+  // Note messages
+  'Note added successfully.': 'تم إضافة الملاحظة بنجاح',
+  'Notes retrieved successfully.': 'تم استرجاع الملاحظات بنجاح',
+  'Note retrieved successfully.': 'تم استرجاع الملاحظة بنجاح',
+  'Customer notes retrieved successfully.': 'تم استرجاع ملاحظات العميل بنجاح',
+  'Note updated successfully.': 'تم تحديث الملاحظة بنجاح',
+  'Note completion status toggled successfully.': 'تم تغيير حالة الملاحظة بنجاح',
+  'Note deleted successfully.': 'تم حذف الملاحظة بنجاح',
+  'Note not found': 'الملاحظة غير موجودة',
 }
 
 // Helper function to translate API messages
@@ -45,7 +55,7 @@ export const translations = {
   customers: 'العملاء',
   expenses: 'المصروفات',
   stock: 'المخزون',
-  reports: 'التقارير',
+  notes: 'الملاحظات',
   settings: 'الإعدادات',
   logout: 'تسجيل الخروج',
 
