@@ -14,6 +14,22 @@ const apiMessageTranslations: Record<string, string> = {
   'User not found': 'المستخدم غير موجود',
   'Invalid OTP code': 'رمز التحقق غير صحيح',
   'OTP expired': 'رمز التحقق منتهي الصلاحية',
+  
+  // Order messages
+  'Order created successfully.': 'تم إنشاء الطلب بنجاح',
+  'Orders retrieved successfully.': 'تم استرجاع الطلبات بنجاح',
+  'Order deleted successfully.': 'تم حذف الطلب بنجاح',
+  
+  // Dashboard messages
+  'Dashboard data retrieved successfully.': 'تم استرجاع بيانات لوحة التحكم بنجاح',
+  
+  // Expense messages
+  'Expense added successfully.': 'تم إضافة المصروف بنجاح',
+  'Expenses retrieved successfully.': 'تم استرجاع المصروفات بنجاح',
+  'Expense retrieved successfully.': 'تم استرجاع المصروف بنجاح',
+  'Expense updated successfully.': 'تم تحديث المصروف بنجاح',
+  'Expense deleted successfully.': 'تم حذف المصروف بنجاح',
+  'Expense not found': 'المصروف غير موجود',
 }
 
 // Helper function to translate API messages

@@ -54,29 +54,57 @@ export interface CustomerFormData {
   id?: string // Only for update
 }
 
-export interface OrderItem {
-  productId: string
-  productName: string
-  quantity: number
-  buyingPrice: number
+// Order Item types
+export interface ProductInOrderItem {
+  id: string
+  name: string
   sellingPrice: number
-  total: number
-  profit: number
+  buyingPrice: number
+  stock: number
+  category?: string
+  description?: string
 }
 
+export interface OrderItem {
+  id?: string
+  productId: string
+  productName?: string
+  quantity: number
+  unitPrice: number
+  buyingPrice: number
+  totalPrice: number
+  product?: ProductInOrderItem
+}
+
+export interface CreateOrderItem {
+  productId: string
+  quantity: number
+  customItemPrice?: number
+}
+
+// Order types
 export interface Order {
   id: string
-  orderNumber: string
-  customerId?: string
+  tenantId?: string
+  customerId?: string | null
   customerName?: string
-  items: OrderItem[]
-  subtotal: number
-  tax: number
+  invoiceNumber: number
+  totalAmount: number
+  totalCost: number
+  totalProfit: number
   discount: number
-  total: number
-  profit: number
-  status: 'pending' | 'completed' | 'cancelled'
+  notes?: string | null
+  isDeleted?: boolean
   createdAt: string
+  orderItems: OrderItem[]
+}
+
+// Form data for creating orders
+export interface CreateOrderRequest {
+  customerId?: string | null
+  discount?: number
+  notes?: string
+  orderItems: CreateOrderItem[]
 }
 
 export interface Expense {
@@ -112,9 +140,21 @@ export enum FilterType {
 export interface DashboardMetrics {
   totalSales: number
   netProfit: number
-  productsCount: number
-  customersCount: number
-  lowStockProducts: number
+  productCount: number
+  customerCount: number
+}
+
+export interface RecentOrder {
+  id: string
+  customerName: string
+  totalAmount: number
+  invoiceNumber: number
+  createdAt: string
+}
+
+export interface DashboardData {
+  stats: DashboardMetrics
+  recentOrders: RecentOrder[]
 }
 
 export interface ChartData {
@@ -129,4 +169,29 @@ export interface PaginatedResponse<T> {
   total: number
   page: number
   pageSize: number
+}
+
+// Expense types
+export interface Expense {
+  id: string
+  productId?: string | null
+  title: string
+  category?: string | null
+  amount: number
+  createdAt: string
+}
+
+export interface CreateExpenseRequest {
+  productId?: string | null
+  title: string
+  category?: string | null
+  amount: number
+}
+
+export interface UpdateExpenseRequest {
+  id: string
+  productId?: string | null
+  title?: string
+  category?: string | null
+  amount?: number
 }

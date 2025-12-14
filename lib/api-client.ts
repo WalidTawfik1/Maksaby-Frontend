@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData } from '@/types'
+import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, CreateExpenseRequest, UpdateExpenseRequest } from '@/types'
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -225,8 +225,6 @@ export const deleteCustomer = async (customerId: string) => {
 // Stock Movement API Functions
 // ==========================
 
-import { StockMovement, FilterType } from '@/types'
-
 interface GetAllStockMovementsParams {
   pagenum?: number
   pagesize?: number
@@ -260,5 +258,174 @@ export const getAllStockMovements = async (params: GetAllStockMovementsParams = 
     },
   })
 
+  return response.data
+}
+
+// ==========================
+// Order API Functions
+// ==========================
+
+interface GetAllOrdersParams {
+  pageNum?: number
+  pageSize?: number
+  filterType?: FilterType | null
+  startDate?: string | null
+  endDate?: string | null
+}
+
+/**
+ * Create a new order
+ */
+export const createOrder = async (data: CreateOrderRequest) => {
+  const payload = {
+    customerId: data.customerId || null,
+    discount: data.discount || 0,
+    notes: data.notes || null,
+    orderItems: data.orderItems,
+  }
+  
+  const response = await apiClient.post<ApiResponse<Order>>('/Order/createorder', payload)
+  return response.data
+}
+
+/**
+ * Get all orders with pagination and filters
+ */
+export const getAllOrders = async (params: GetAllOrdersParams = {}) => {
+  const {
+    pageNum = 1,
+    pageSize = 10,
+    filterType = null,
+    startDate = null,
+    endDate = null,
+  } = params
+  
+  const response = await apiClient.get<ApiResponse<Order[]>>('/Order/getallorders', {
+    params: {
+      pagenum: pageNum,
+      pagesize: pageSize,
+      FilterType: filterType,
+      StartDate: startDate,
+      EndDate: endDate,
+    },
+  })
+  
+  return response.data
+}
+
+/**
+ * Get a single order by ID
+ */
+export const getOrderById = async (orderId: string) => {
+  const response = await apiClient.get<ApiResponse<Order>>(`/Order/${orderId}`)
+  return response.data
+}
+
+/**
+ * Get orders by customer ID
+ */
+export const getOrdersByCustomerId = async (
+  customerId: string,
+  pageNum: number = 1,
+  pageSize: number = 10
+) => {
+  const response = await apiClient.get<ApiResponse<Order[]>>(
+    `/Order/getorderbycustomerid/${customerId}`,
+    {
+      params: {
+        pagenum: pageNum,
+        pagesize: pageSize,
+      },
+    }
+  )
+  
+  return response.data
+}
+
+/**
+ * Delete an order (soft delete)
+ */
+export const deleteOrder = async (orderId: string) => {
+  const response = await apiClient.delete<ApiResponse<string>>(`/Order/${orderId}`)
+  return response.data
+}
+
+// ==========================
+// Dashboard API Functions
+// ==========================
+
+/**
+ * Get dashboard data with stats and recent orders
+ */
+export const getDashboardData = async () => {
+  const response = await apiClient.get<ApiResponse<DashboardData>>('/Dashboard')
+  return response.data
+}
+
+// ==========================
+// Expense API Functions
+// ==========================
+
+interface GetAllExpensesParams {
+  pageNum?: number
+  pageSize?: number
+  filterType?: FilterType | null
+  startDate?: string | null
+  endDate?: string | null
+}
+
+/**
+ * Add a new expense
+ */
+export const addExpense = async (data: CreateExpenseRequest) => {
+  const response = await apiClient.post<ApiResponse<Expense>>('/Expense/addexpense', data)
+  return response.data
+}
+
+/**
+ * Get all expenses with optional filters
+ */
+export const getAllExpenses = async (params: GetAllExpensesParams = {}) => {
+  const queryParams: any = {
+    pagenum: params.pageNum || 1,
+    pagesize: params.pageSize || 10,
+  }
+
+  if (params.filterType !== null && params.filterType !== undefined) {
+    queryParams.FilterType = params.filterType
+  }
+
+  if (params.filterType === FilterType.Custom) {
+    if (params.startDate) queryParams.StartDate = params.startDate
+    if (params.endDate) queryParams.EndDate = params.endDate
+  }
+
+  const response = await apiClient.get<ApiResponse<Expense[]>>('/Expense/getallexpenses', {
+    params: queryParams,
+  })
+  return response.data
+}
+
+/**
+ * Get expense by ID
+ */
+export const getExpenseById = async (expenseId: string) => {
+  const response = await apiClient.get<ApiResponse<Expense>>(`/Expense/${expenseId}`)
+  return response.data
+}
+
+/**
+ * Update an existing expense
+ */
+export const updateExpense = async (data: UpdateExpenseRequest) => {
+  const response = await apiClient.patch<ApiResponse<boolean>>('/Expense/updateexpense', data)
+  return response.data
+}
+
+/**
+ * Delete an expense
+ */
+export const deleteExpense = async (expenseId: string) => {
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/Expense/${expenseId}`)
   return response.data
 }

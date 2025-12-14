@@ -2,15 +2,15 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Users, Search, Edit, Trash2 } from 'lucide-react'
+import { Plus, Users, Search, Edit, Trash2, ShoppingCart, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CustomerFormDialog } from '@/components/customer-form-dialog'
 import { ConfirmDialog } from '@/components/confirm-dialog'
-import { getAllCustomers, deleteCustomer as deleteCustomerApi } from '@/lib/api-client'
-import { formatCurrency } from '@/lib/utils'
-import { Customer } from '@/types'
+import { getAllCustomers, deleteCustomer as deleteCustomerApi, getOrdersByCustomerId } from '@/lib/api-client'
+import { formatCurrency, formatDateTime } from '@/lib/utils'
+import { Customer, Order } from '@/types'
 import toast from 'react-hot-toast'
 
 export default function CustomersPage() {
@@ -20,6 +20,8 @@ export default function CustomersPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null)
+  const [isPurchaseHistoryOpen, setIsPurchaseHistoryOpen] = useState(false)
+  const [customerForHistory, setCustomerForHistory] = useState<Customer | null>(null)
   const queryClient = useQueryClient()
 
   const { data: customersResponse, isLoading } = useQuery({
@@ -34,6 +36,17 @@ export default function CustomersPage() {
   })
 
   const customers = customersResponse?.data || []
+
+  // Query for customer orders
+  const { data: customerOrders, isLoading: isLoadingOrders } = useQuery({
+    queryKey: ['customer-orders', customerForHistory?.id],
+    queryFn: async () => {
+      if (!customerForHistory?.id) return []
+      const response = await getOrdersByCustomerId(customerForHistory.id, 1, 50)
+      return response.isSuccess ? response.data : []
+    },
+    enabled: !!customerForHistory?.id && isPurchaseHistoryOpen,
+  })
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -91,6 +104,16 @@ export default function CustomersPage() {
   const handleCloseForm = () => {
     setIsFormOpen(false)
     setSelectedCustomer(null)
+  }
+
+  const handleViewPurchaseHistory = (customer: Customer) => {
+    setCustomerForHistory(customer)
+    setIsPurchaseHistoryOpen(true)
+  }
+
+  const handleClosePurchaseHistory = () => {
+    setIsPurchaseHistoryOpen(false)
+    setCustomerForHistory(null)
   }
 
   if (isLoading) {
@@ -162,7 +185,13 @@ export default function CustomersPage() {
                     {formatCurrency(customer.totalSpent)}
                   </span>
                 </div>
-                <Button variant="outline" size="sm" className="w-full mt-3">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mt-3"
+                  onClick={() => handleViewPurchaseHistory(customer)}
+                >
+                  <ShoppingCart className="ml-2 h-3 w-3" />
                   عرض سجل المشتريات
                 </Button>
                 <div className="flex gap-2 mt-2">
@@ -209,6 +238,98 @@ export default function CustomersPage() {
         cancelText="إلغاء"
         isLoading={deleteMutation.isPending}
       />
+
+      {/* Purchase History Dialog */}
+      {isPurchaseHistoryOpen && customerForHistory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={handleClosePurchaseHistory}>
+          <div className="bg-background rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-background border-b p-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold">سجل مشتريات {customerForHistory.name}</h2>
+                <p className="text-sm text-muted-foreground">
+                  إجمالي المشتريات: {formatCurrency(customerForHistory.totalSpent)}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleClosePurchaseHistory}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="p-6">
+              {isLoadingOrders ? (
+                <div className="text-center py-8">جاري التحميل...</div>
+              ) : customerOrders && customerOrders.length > 0 ? (
+                <div className="space-y-4">
+                  {customerOrders.map((order: Order) => (
+                    <Card key={order.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg">فاتورة #{order.invoiceNumber}</CardTitle>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {formatDateTime(order.createdAt)}
+                            </p>
+                          </div>
+                          <div className="text-left">
+                            <p className="text-sm text-muted-foreground">الإجمالي</p>
+                            <p className="text-xl font-bold text-primary">
+                              {formatCurrency(order.totalAmount)}
+                            </p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">عدد المنتجات:</span>
+                            <span>{order.orderItems?.reduce((sum, item) => sum + item.quantity, 0) || 0}</span>
+                          </div>
+                          {order.discount > 0 && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">الخصم:</span>
+                              <span className="text-orange-600">{order.discount}%</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">الربح:</span>
+                            <span className="font-semibold text-green-600">
+                              {formatCurrency(order.totalProfit)}
+                            </span>
+                          </div>
+                          {order.notes && (
+                            <div className="pt-2 border-t">
+                              <p className="text-sm text-muted-foreground">ملاحظات:</p>
+                              <p className="text-sm">{order.notes}</p>
+                            </div>
+                          )}
+                          {order.orderItems && order.orderItems.length > 0 && (
+                            <div className="pt-2 border-t">
+                              <p className="text-sm font-semibold mb-2">المنتجات:</p>
+                              <div className="space-y-1">
+                                {order.orderItems.map((item, index) => (
+                                  <div key={index} className="flex justify-between text-sm bg-muted/50 p-2 rounded">
+                                    <span>{item.productName} × {item.quantity}</span>
+                                    <span className="font-medium">{formatCurrency(item.totalPrice)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">لا توجد مشتريات لهـــــــذا العميل</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

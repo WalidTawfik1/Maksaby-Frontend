@@ -2,23 +2,46 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import apiClient from '@/lib/api-client'
-import { formatCurrency } from '@/lib/utils'
-import { DashboardMetrics } from '@/types'
-import { LayoutDashboard, TrendingUp, Package, Users } from 'lucide-react'
+import { getDashboardData } from '@/lib/api-client'
+import { formatCurrency, formatDateTime } from '@/lib/utils'
+import { translateApiMessage } from '@/lib/translations'
+import { LayoutDashboard, TrendingUp, Package, Users, ShoppingCart } from 'lucide-react'
+import toast from 'react-hot-toast'
+import Link from 'next/link'
 
 export default function DashboardPage() {
-  const { data: metrics, isLoading } = useQuery({
-    queryKey: ['dashboard-metrics'],
+  const { data: dashboardData, isLoading } = useQuery({
+    queryKey: ['dashboard-data'],
     queryFn: async () => {
-      const response = await apiClient.get<DashboardMetrics>('/dashboard/metrics')
-      return response.data
+      try {
+        const response = await getDashboardData()
+        if (response.isSuccess) {
+          return response.data
+        } else {
+          toast.error(translateApiMessage(response.message))
+          return null
+        }
+      } catch (error: any) {
+        const errorMsg = error.response?.data?.message || 'حدث خطأ أثناء تحميل البيانات'
+        toast.error(translateApiMessage(errorMsg))
+        return null
+      }
     },
   })
 
   if (isLoading) {
-    return <div className="text-center">جاري التحميل...</div>
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">جاري التحميل...</p>
+        </div>
+      </div>
+    )
   }
+
+  const stats = dashboardData?.stats
+  const recentOrders = dashboardData?.recentOrders || []
 
   return (
     <div className="space-y-6">
@@ -35,7 +58,7 @@ export default function DashboardPage() {
             <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(metrics?.totalSales || 0)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(stats?.totalSales || 0)}</div>
           </CardContent>
         </Card>
 
@@ -46,7 +69,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(metrics?.netProfit || 0)}
+              {formatCurrency(stats?.netProfit || 0)}
             </div>
           </CardContent>
         </Card>
@@ -57,7 +80,7 @@ export default function DashboardPage() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics?.productsCount || 0}</div>
+            <div className="text-2xl font-bold">{stats?.productCount || 0}</div>
           </CardContent>
         </Card>
 
@@ -67,18 +90,48 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics?.customersCount || 0}</div>
+            <div className="text-2xl font-bold">{stats?.customerCount || 0}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Recent Orders */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>الطلبات الأخيرة</CardTitle>
+          <Link href="/dashboard/orders">
+            <span className="text-sm text-primary hover:underline">عرض الكل</span>
+          </Link>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-center py-8">لا توجد طلبات حديثة</p>
+          {recentOrders.length === 0 ? (
+            <div className="text-center py-8">
+              <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground mb-2" />
+              <p className="text-muted-foreground">لا توجد طلبات حديثة</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {recentOrders.map((order) => (
+                <Link href={`/dashboard/orders`} key={order.id}>
+                  <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">فاتورة #{order.invoiceNumber}</p>
+                        <span className="text-sm text-muted-foreground">•</span>
+                        <p className="text-sm text-muted-foreground">{order.customerName}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {formatDateTime(order.createdAt)}
+                      </p>
+                    </div>
+                    <div className="text-left">
+                      <p className="font-bold text-lg">{formatCurrency(order.totalAmount)}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
