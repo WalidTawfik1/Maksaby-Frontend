@@ -39,7 +39,7 @@ export default function StockPage() {
   })
 
   const movements = movementsResponse?.data || []
-  const lowStockProducts = products.filter((p) => p.stock <= 5)
+  const lowStockProducts = products.filter((p) => p.stock <= 2)
   const totalProducts = products.length
   const totalStockValue = products.reduce((sum, p) => sum + (p.stock * p.buyingPrice), 0)
 

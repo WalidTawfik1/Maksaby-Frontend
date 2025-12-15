@@ -40,6 +40,10 @@ const apiMessageTranslations: Record<string, string> = {
   'Note completion status toggled successfully.': 'تم تغيير حالة الملاحظة بنجاح',
   'Note deleted successfully.': 'تم حذف الملاحظة بنجاح',
   'Note not found': 'الملاحظة غير موجودة',
+  
+  // Profile messages
+  'Profile retrieved successfully.': 'تم استرجاع الملف الشخصي بنجاح',
+  'Profile updated successfully.': 'تم تحديث الملف الشخصي بنجاح',
 }
 
 // Helper function to translate API messages
@@ -150,6 +154,16 @@ export const translations = {
   forgotPassword: 'نسيت كلمة المرور؟',
   resetPassword: 'إعادة تعيين كلمة المرور',
   welcomeBack: 'مرحباً بعودتك',
+  
+  // Profile/Settings
+  profile: 'الملف الشخصي',
+  accountSettings: 'إعدادات الحساب',
+  updateProfile: 'تحديث الملف الشخصي',
+  profilePicture: 'صورة الملف الشخصي',
+  chooseImage: 'اختر صورة',
+  saveChanges: 'حفظ التغييرات',
+  name: 'الاسم',
+  phoneNumber: 'رقم الهاتف',
 }
 
 export type TranslationKey = keyof typeof translations

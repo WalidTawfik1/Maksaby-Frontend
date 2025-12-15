@@ -11,7 +11,8 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatDate(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date
+  // Ensure the date is treated as UTC from server
+  const d = typeof date === 'string' ? new Date(date.endsWith('Z') ? date : date + 'Z') : date
   return d.toLocaleDateString('ar-EG', {
     year: 'numeric',
     month: 'long',
@@ -21,7 +22,8 @@ export function formatDate(date: string | Date): string {
 }
 
 export function formatDateTime(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date
+  // Ensure the date is treated as UTC from server
+  const d = typeof date === 'string' ? new Date(date.endsWith('Z') ? date : date + 'Z') : date
   return d.toLocaleString('ar-EG', {
     year: 'numeric',
     month: 'long',

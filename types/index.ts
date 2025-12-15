@@ -6,6 +6,22 @@ export interface User {
   roles: string[]
 }
 
+// User Profile
+export interface UserProfile {
+  name: string
+  email: string
+  userName: string
+  phoneNumber: string
+  logoUrl: string
+}
+
+// Form data for updating profile
+export interface UpdateProfileFormData {
+  name: string
+  phoneNumber: string
+  logo?: File | null
+}
+
 // API Response wrapper
 export interface ApiResponse<T> {
   isSuccess: boolean

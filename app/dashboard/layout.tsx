@@ -31,10 +31,12 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
       <DashboardSidebar />
-      <main className="flex-1 overflow-y-auto bg-background p-6">
-        {children}
+      <main className="flex-1 overflow-y-auto p-8">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   )

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, CreateExpenseRequest, UpdateExpenseRequest, Note, CreateNoteRequest, UpdateNoteRequest } from '@/types'
+import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, CreateExpenseRequest, UpdateExpenseRequest, Note, CreateNoteRequest, UpdateNoteRequest, UserProfile, UpdateProfileFormData } from '@/types'
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -354,11 +354,29 @@ export const deleteOrder = async (orderId: string) => {
 // Dashboard API Functions
 // ==========================
 
+interface GetDashboardDataParams {
+  startDate?: string | null
+  endDate?: string | null
+  filterType?: FilterType | null
+}
+
 /**
  * Get dashboard data with stats and recent orders
  */
-export const getDashboardData = async () => {
-  const response = await apiClient.get<ApiResponse<DashboardData>>('/Dashboard')
+export const getDashboardData = async (params: GetDashboardDataParams = {}) => {
+  const {
+    startDate = null,
+    endDate = null,
+    filterType = null,
+  } = params
+
+  const response = await apiClient.get<ApiResponse<DashboardData>>('/Dashboard', {
+    params: {
+      StartDate: startDate,
+      EndDate: endDate,
+      FilterType: filterType,
+    },
+  })
   return response.data
 }
 
@@ -506,5 +524,38 @@ export const toggleNoteCompletion = async (noteId: string) => {
  */
 export const deleteNote = async (noteId: string) => {
   const response = await apiClient.delete<ApiResponse<boolean>>(`/Note/${noteId}`)
+  return response.data
+}
+
+// ==========================
+// User Profile API Functions
+// ==========================
+
+/**
+ * Get user profile
+ */
+export const getUserProfile = async () => {
+  const response = await apiClient.get<ApiResponse<UserProfile>>('/User/profile')
+  return response.data
+}
+
+/**
+ * Update user profile
+ */
+export const updateUserProfile = async (data: UpdateProfileFormData) => {
+  const formData = new FormData()
+  formData.append('Name', data.name)
+  formData.append('PhoneNumber', data.phoneNumber)
+  
+  if (data.logo) {
+    formData.append('Logo', data.logo)
+  }
+  
+  const response = await apiClient.patch<ApiResponse<boolean>>('/User/updateprofile', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+  
   return response.data
 }
