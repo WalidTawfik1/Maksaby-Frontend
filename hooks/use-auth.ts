@@ -77,7 +77,7 @@ export function useAuth() {
         Cookies.set('token', response.data.token, { expires: 7 })
         Cookies.set('user', JSON.stringify(response.data), { expires: 7 })
         toast.success(translateApiMessage(response.message) || 'تم إنشاء الحساب بنجاح')
-        router.push('/dashboard')
+        router.push('/auth/welcome')
       } else {
         toast.error(translateApiMessage(response.errors?.[0]) || 'فشل إنشاء الحساب')
       }

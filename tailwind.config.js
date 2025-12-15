@@ -93,6 +93,12 @@ module.exports = {
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
         "shimmer": "shimmer 2s linear infinite",
       },
+      animationDelay: {
+        '200': '200ms',
+        '300': '300ms',
+        '500': '500ms',
+        '700': '700ms',
+      },
     },
   },
   plugins: [require("tailwindcss-animate"), require("tailwindcss-rtl")],
