@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { getDashboardData, getUserProfile } from '@/lib/api-client'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { translateApiMessage } from '@/lib/translations'
-import { LayoutDashboard, TrendingUp, Package, Users, ShoppingCart, User as UserIcon, Filter, X } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, Package, Users, ShoppingCart, User as UserIcon, Filter, X, Wallet, Receipt } from 'lucide-react'
 import { FilterType } from '@/types'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
@@ -202,7 +202,7 @@ export default function DashboardPage() {
       )}
 
       {/* Metrics Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 animate-fade-in">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-fade-in">
         <Card className="overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
@@ -219,6 +219,21 @@ export default function DashboardPage() {
         </Card>
 
         <Card className="overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-rose-500/10" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+            <CardTitle className="text-sm font-medium">تكلفة البضاعة المباعة</CardTitle>
+            <div className="p-2 bg-red-500/10 rounded-lg">
+              <Receipt className="h-5 w-5 text-red-600" />
+            </div>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+              {formatCurrency(stats?.cogs || 0)}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
             <CardTitle className="text-sm font-medium">صافي الربح</CardTitle>
@@ -229,6 +244,21 @@ export default function DashboardPage() {
           <CardContent className="relative">
             <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
               {formatCurrency(stats?.netProfit || 0)}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-yellow-500/10" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+            <CardTitle className="text-sm font-medium">إجمالي المصروفات</CardTitle>
+            <div className="p-2 bg-amber-500/10 rounded-lg">
+              <Wallet className="h-5 w-5 text-amber-600" />
+            </div>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">
+              {formatCurrency(stats?.totalExpenses || 0)}
             </div>
           </CardContent>
         </Card>

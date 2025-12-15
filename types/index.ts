@@ -145,7 +145,9 @@ export enum FilterType {
 
 export interface DashboardMetrics {
   totalSales: number
+  cogs: number
   netProfit: number
+  totalExpenses: number
   productCount: number
   customerCount: number
 }
