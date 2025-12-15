@@ -123,16 +123,6 @@ export interface CreateOrderRequest {
   orderItems: CreateOrderItem[]
 }
 
-export interface Expense {
-  id: string
-  category: string
-  amount: number
-  description?: string
-  date: string
-  linkedProductId?: string
-  createdAt: string
-}
-
 export interface StockMovement {
   id: string
   productId: string
