@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, ShoppingCart, Eye, Printer, X, Filter, Calendar, Trash2 } from 'lucide-react'
+import { Plus, ShoppingCart, Eye, Printer, X, Filter, Calendar, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -26,17 +26,19 @@ export default function OrdersPage() {
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
   const [isOrderFormOpen, setIsOrderFormOpen] = useState(false)
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const { data: orders, isLoading, refetch } = useQuery({
-    queryKey: ['orders', filterType, startDate, endDate],
+    queryKey: ['orders', currentPage, pageSize, filterType, startDate, endDate],
     queryFn: async () => {
       try {
         const response = await getAllOrders({ 
-          pageNum: 1, 
-          pageSize: 50,
+          pageNum: currentPage, 
+          pageSize: pageSize,
           filterType: filterType,
           startDate: filterType === FilterType.Custom ? startDate : null,
           endDate: filterType === FilterType.Custom ? endDate : null,
@@ -299,35 +301,50 @@ export default function OrdersPage() {
                 <Button 
                   variant={filterType === null ? 'default' : 'outline'} 
                   size="sm" 
-                  onClick={() => setFilterType(null)}
+                  onClick={() => {
+                    setFilterType(null)
+                    setCurrentPage(1)
+                  }}
                 >
                   الكل
                 </Button>
                 <Button 
                   variant={filterType === FilterType.Today ? 'default' : 'outline'} 
                   size="sm" 
-                  onClick={() => setFilterType(FilterType.Today)}
+                  onClick={() => {
+                    setFilterType(FilterType.Today)
+                    setCurrentPage(1)
+                  }}
                 >
                   اليوم
                 </Button>
                 <Button 
                   variant={filterType === FilterType.ThisWeek ? 'default' : 'outline'} 
                   size="sm" 
-                  onClick={() => setFilterType(FilterType.ThisWeek)}
+                  onClick={() => {
+                    setFilterType(FilterType.ThisWeek)
+                    setCurrentPage(1)
+                  }}
                 >
                   هذا الأسبوع
                 </Button>
                 <Button 
                   variant={filterType === FilterType.ThisMonth ? 'default' : 'outline'} 
                   size="sm" 
-                  onClick={() => setFilterType(FilterType.ThisMonth)}
+                  onClick={() => {
+                    setFilterType(FilterType.ThisMonth)
+                    setCurrentPage(1)
+                  }}
                 >
                   هذا الشهر
                 </Button>
                 <Button 
                   variant={filterType === FilterType.Custom ? 'default' : 'outline'} 
                   size="sm" 
-                  onClick={() => setFilterType(FilterType.Custom)}
+                  onClick={() => {
+                    setFilterType(FilterType.Custom)
+                    setCurrentPage(1)
+                  }}
                 >
                   مخصص
                 </Button>
@@ -457,6 +474,35 @@ export default function OrdersPage() {
           ))
         )}
       </div>
+
+      {/* Pagination */}
+      {orders && orders.length > 0 && (
+        <div className="flex items-center justify-between pt-4">
+          <div className="text-sm text-muted-foreground">
+            الصفحة {currentPage}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronRight className="h-4 w-4" />
+              السابق
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={orders.length < pageSize}
+            >
+              التالي
+              <ChevronLeft className="h-4 w-4 mr-1" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Order Form Dialog */}
       <OrderFormDialog 

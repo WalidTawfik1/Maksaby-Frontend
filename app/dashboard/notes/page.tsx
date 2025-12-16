@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, StickyNote, Search, Edit, Trash2, Check, X as XIcon, User } from 'lucide-react'
+import { Plus, StickyNote, Search, Edit, Trash2, Check, X as XIcon, User, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +18,8 @@ export default function NotesPage() {
   const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCompleted, setFilterCompleted] = useState<boolean | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -25,11 +27,11 @@ export default function NotesPage() {
   const queryClient = useQueryClient()
 
   const { data: notesResponse, isLoading } = useQuery({
-    queryKey: ['notes', searchQuery, filterCompleted],
+    queryKey: ['notes', currentPage, pageSize, searchQuery, filterCompleted],
     queryFn: async () => {
       return await getAllNotes({
-        pageNum: 1,
-        pageSize: 50,
+        pageNum: currentPage,
+        pageSize: pageSize,
         searchTerm: searchQuery || null,
         isCompleted: filterCompleted,
       })
@@ -70,6 +72,7 @@ export default function NotesPage() {
 
   const handleSearch = () => {
     setSearchQuery(searchInput)
+    setCurrentPage(1)
   }
 
   const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -151,21 +154,30 @@ export default function NotesPage() {
           <Button
             variant={filterCompleted === null ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setFilterCompleted(null)}
+            onClick={() => {
+              setFilterCompleted(null)
+              setCurrentPage(1)
+            }}
           >
             الكل
           </Button>
           <Button
             variant={filterCompleted === false ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setFilterCompleted(false)}
+            onClick={() => {
+              setFilterCompleted(false)
+              setCurrentPage(1)
+            }}
           >
             قيد الانتظار
           </Button>
           <Button
             variant={filterCompleted === true ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setFilterCompleted(true)}
+            onClick={() => {
+              setFilterCompleted(true)
+              setCurrentPage(1)
+            }}
           >
             مكتملة
           </Button>
@@ -283,6 +295,35 @@ export default function NotesPage() {
           ))
         )}
       </div>
+
+      {/* Pagination */}
+      {notes.length > 0 && (
+        <div className="flex items-center justify-between pt-4">
+          <div className="text-sm text-muted-foreground">
+            الصفحة {currentPage}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronRight className="h-4 w-4" />
+              السابق
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={notes.length < pageSize}
+            >
+              التالي
+              <ChevronLeft className="h-4 w-4 mr-1" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Note Form Dialog */}
       <NoteFormDialog

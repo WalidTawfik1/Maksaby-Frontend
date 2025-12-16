@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Users, Search, Edit, Trash2, ShoppingCart, X } from 'lucide-react'
+import { Plus, Users, Search, Edit, Trash2, ShoppingCart, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,6 +16,8 @@ import toast from 'react-hot-toast'
 export default function CustomersPage() {
   const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -25,11 +27,11 @@ export default function CustomersPage() {
   const queryClient = useQueryClient()
 
   const { data: customersResponse, isLoading } = useQuery({
-    queryKey: ['customers', searchQuery],
+    queryKey: ['customers', currentPage, pageSize, searchQuery],
     queryFn: async () => {
       return await getAllCustomers({
-        pageNum: 1,
-        pageSize: 50,
+        pageNum: currentPage,
+        pageSize: pageSize,
         searchTerm: searchQuery,
       })
     },
@@ -65,6 +67,7 @@ export default function CustomersPage() {
 
   const handleSearch = () => {
     setSearchQuery(searchInput)
+    setCurrentPage(1)
   }
 
   const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -238,6 +241,35 @@ export default function CustomersPage() {
         cancelText="إلغاء"
         isLoading={deleteMutation.isPending}
       />
+
+      {/* Pagination */}
+      {customers.length > 0 && (
+        <div className="flex items-center justify-between pt-4">
+          <div className="text-sm text-muted-foreground">
+            الصفحة {currentPage}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronRight className="h-4 w-4" />
+              السابق
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={customers.length < pageSize}
+            >
+              التالي
+              <ChevronLeft className="h-4 w-4 mr-1" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Purchase History Dialog */}
       {isPurchaseHistoryOpen && customerForHistory && (

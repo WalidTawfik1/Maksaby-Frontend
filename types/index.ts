@@ -189,6 +189,11 @@ export interface Expense {
   createdAt: string
 }
 
+export interface ExpensesResponse {
+  expenses: Expense[]
+  totalExpenses: number
+}
+
 export interface CreateExpenseRequest {
   productId?: string | null
   title: string

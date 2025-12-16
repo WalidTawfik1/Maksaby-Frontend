@@ -6,7 +6,7 @@ import { X, Plus, Trash2, Loader2, ShoppingCart, User, Tag, FileText, Package, R
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { createOrder, getAllCustomers, getAllProducts } from '@/lib/api-client'
+import { createOrder, getAllCustomers, getAllProductsWithoutPagination } from '@/lib/api-client'
 import { CreateOrderRequest, CreateOrderItem } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import { translateApiMessage } from '@/lib/translations'
@@ -48,8 +48,8 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
 
   // Fetch products
   const { data: productsResponse } = useQuery({
-    queryKey: ['products'],
-    queryFn: () => getAllProducts({ pageSize: 100 }),
+    queryKey: ['products-all'],
+    queryFn: () => getAllProductsWithoutPagination(),
   })
 
   const customers = customersResponse?.data || []

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, CreateExpenseRequest, UpdateExpenseRequest, Note, CreateNoteRequest, UpdateNoteRequest, UserProfile, UpdateProfileFormData } from '@/types'
+import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, ExpensesResponse, CreateExpenseRequest, UpdateExpenseRequest, Note, CreateNoteRequest, UpdateNoteRequest, UserProfile, UpdateProfileFormData } from '@/types'
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -65,6 +65,14 @@ export const getAllProducts = async (params: GetAllProductsParams = {}) => {
     },
   })
   
+  return response.data
+}
+
+/**
+ * Get all products without pagination
+ */
+export const getAllProductsWithoutPagination = async () => {
+  const response = await apiClient.get<ApiResponse<Product[]>>('/Product/getallproductswithoutpagination')
   return response.data
 }
 
@@ -418,7 +426,7 @@ export const getAllExpenses = async (params: GetAllExpensesParams = {}) => {
     if (params.endDate) queryParams.EndDate = params.endDate
   }
 
-  const response = await apiClient.get<ApiResponse<Expense[]>>('/Expense/getallexpenses', {
+  const response = await apiClient.get<ApiResponse<ExpensesResponse>>('/Expense/getallexpenses', {
     params: queryParams,
   })
   return response.data
