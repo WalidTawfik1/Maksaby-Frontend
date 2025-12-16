@@ -83,6 +83,8 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
       if (response.isSuccess) {
         queryClient.invalidateQueries({ queryKey: ['orders'] })
         queryClient.invalidateQueries({ queryKey: ['dashboard-data'] })
+        queryClient.invalidateQueries({ queryKey: ['products'] })
+        queryClient.invalidateQueries({ queryKey: ['products-all'] })
         toast.success(translateApiMessage(response.message))
         onClose()
         resetForm()
