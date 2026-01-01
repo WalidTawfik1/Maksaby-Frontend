@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { getAllStockMovements, getAllProducts } from '@/lib/api-client'
+import { getAllStockMovements, getAllProductsWithoutPagination } from '@/lib/api-client'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import { StockMovement, FilterType, Product } from '@/types'
 
@@ -21,10 +21,11 @@ export default function StockPage() {
 
   const { data: productsResponse, isLoading: loadingProducts } = useQuery({
     queryKey: ['products-stock'],
-    queryFn: async () => await getAllProducts({ pageSize: 100 }),
+    queryFn: async () => await getAllProductsWithoutPagination(),
   })
 
-  const products = productsResponse?.data || []
+  const allProducts = productsResponse?.data || []
+  const products = allProducts.filter((p) => p.stock > 0)
 
   const { data: movementsResponse, isLoading: loadingMovements } = useQuery({
     queryKey: ['stock-movements', currentPage, pageSize, filterType, startDate, endDate],
@@ -39,9 +40,9 @@ export default function StockPage() {
   })
 
   const movements = movementsResponse?.data || []
-  const lowStockProducts = products.filter((p) => p.stock <= 2)
-  const totalProducts = products.length
-  const totalStockValue = products.reduce((sum, p) => sum + (p.stock * p.buyingPrice), 0)
+  const lowStockProducts = allProducts.filter((p) => p.stock <= 2)
+  const totalProducts = allProducts.length
+  const totalStockValue = allProducts.reduce((sum, p) => sum + (p.stock * p.buyingPrice), 0)
 
   const getMovementIcon = (type: string) => {
     if (type === 'IN') return <ArrowUpCircle className="h-4 w-4 text-green-600" />
