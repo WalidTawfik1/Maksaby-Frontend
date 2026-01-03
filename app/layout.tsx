@@ -3,6 +3,7 @@ import { Cairo } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { ToasterProvider } from '@/components/toaster-provider'
+import { Analytics } from '@vercel/analytics/next'
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -29,6 +30,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <ToasterProvider />
+          <Analytics />
         </Providers>
       </body>
     </html>
