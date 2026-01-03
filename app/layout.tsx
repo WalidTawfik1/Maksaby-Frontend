@@ -4,6 +4,7 @@ import './globals.css'
 import { Providers } from '@/components/providers'
 import { ToasterProvider } from '@/components/toaster-provider'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -31,6 +32,7 @@ export default function RootLayout({
           {children}
           <ToasterProvider />
           <Analytics />
+          <SpeedInsights />
         </Providers>
       </body>
     </html>
