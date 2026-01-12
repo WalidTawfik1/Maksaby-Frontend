@@ -1,8 +1,21 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
 export default function Home() {
+  const router = useRouter()
+
+  useEffect(() => {
+    const token = Cookies.get('token')
+    if (token) {
+      router.push('/dashboard')
+    }
+  }, [router])
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Navigation */}
