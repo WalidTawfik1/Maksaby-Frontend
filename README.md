@@ -1,148 +1,231 @@
-# مكسبي (Maksaby) - Frontend
+# Maksaby - Inventory & Order Management System
 
-نظام إدارة المخزون والطلبات للمحلات التجارية مبني بـ Next.js 15 مع دعم كامل للغة العربية والـ RTL.
+<div align="center">
+  <img src="public/logo.png" alt="Maksaby Logo" width="200" />
+  <p><strong>A comprehensive inventory and order management system for retail stores</strong></p>
+  <p>Built with Next.js 15 with full Arabic language and RTL support</p>
+</div>
 
-## المميزات
+## 🌟 Features
 
-- ✅ **لوحة قيادة شاملة**: عرض المبيعات، الأرباح، وإحصائيات المنتجات
-- ✅ **إدارة المنتجات**: إضافة، تعديل، وحذف المنتجات مع رفع الصور
-- ✅ **نظام الطلبات**: إنشاء طلبات POS مع حساب الأرباح تلقائياً
-- ✅ **إدارة العملاء**: متابعة بيانات العملاء وسجل المشتريات
-- ✅ **تتبع المصروفات**: تسجيل المصروفات بفئات مختلفة
-- ✅ **إدارة المخزون**: تتبع حركة المخزون IN/OUT
-- ✅ **التقارير**: تقارير الأرباح والخسائر والمبيعات
-- ✅ **نظام مستأجرين متعدد**: دعم Multi-tenant
-- ✅ **مصادقة JWT**: نظام تسجيل دخول آمن
-- ✅ **دعم RTL**: واجهة عربية كاملة مع تخطيط من اليمين لليسار
+### 📊 Comprehensive Dashboard
+- Real-time sales and profit metrics
+- Product statistics and inventory status
+- Customer engagement overview
+- Low stock alerts
 
-## التقنيات المستخدمة
+### 📦 Inventory Management
+- Add, edit, and delete products with image upload
+- Track stock levels in real-time
+- Stock movement tracking (IN/OUT)
+- Low stock notifications
+- Product categorization
 
-- **Next.js 15** - App Router مع TypeScript
-- **Tailwind CSS** - مع plugin RTL
-- **shadcn/ui** - مكتبة المكونات
-- **TanStack Query** - إدارة حالة الـ Server
-- **React Hook Form** - إدارة النماذج
-- **Zod** - التحقق من البيانات
-- **Axios** - HTTP Client
-- **Lucide React** - الأيقونات
-- **Cairo Font** - الخط العربي
+### 🛒 Order Management
+- Create POS orders with automatic profit calculation
+- Order status tracking (Completed, Pending, Cancelled)
+- Customer order history
+- Detailed order breakdown with costs and profits
 
-## المتطلبات
+### 👥 Customer Management
+- Comprehensive customer directory
+- Contact information management
+- Purchase history tracking
+- Customer-specific notes
+
+### 💰 Expense Tracking
+- Record expenses by different categories
+- Track business costs for accurate profit calculation
+- Expense history and reports
+
+### 📝 Notes Management
+- Create and manage notes for customers and orders
+- Keep important business information organized
+- Toggle visibility and priority
+
+### 🔐 Authentication & Security
+- JWT-based secure authentication
+- Multi-tenant support
+- Protected routes and API calls
+- User profile management
+
+### 🌐 Arabic-First Design
+- Full RTL (Right-to-Left) support
+- Arabic UI throughout the application
+- Cairo font for beautiful Arabic typography
+- Localized error messages and notifications
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Next.js 15** - React framework with App Router and TypeScript
+- **Tailwind CSS** - Utility-first CSS with RTL plugin
+- **shadcn/ui** - Beautiful, accessible component library
+- **TanStack Query** - Server state management
+- **React Hook Form** - Form handling and validation
+- **Zod** - Schema validation
+- **Axios** - HTTP client
+- **Lucide React** - Icon library
+- **Cairo Font** - Arabic typography
+
+### Analytics & Monitoring
+- **Vercel Analytics** - Performance monitoring
+- **Vercel Speed Insights** - Core Web Vitals tracking
+
+## 📋 Prerequisites
 
 - Node.js 18+ 
-- npm أو yarn أو pnpm
+- npm, yarn, or pnpm
+- Backend API (see Backend Requirements section)
 
-## التثبيت
+## 🚀 Getting Started
 
-### 1. تثبيت المكتبات
+### 1. Install Dependencies
 
 ```bash
 npm install
+# or
+yarn install
+# or
+pnpm install
 ```
 
-### 2. إعداد ملف البيئة
+### 2. Environment Setup
 
-انسخ ملف `.env.example` إلى `.env.local` وعدّل القيم:
-
-```bash
-cp .env.example .env.local
-```
-
-محتوى `.env.local`:
+Create a `.env.local` file in the root directory:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 NEXT_PUBLIC_APP_NAME=مكسبي
-NEXT_PUBLIC_CURRENCY=ج.م
+NEXT_PUBLIC_CURRENCY=EGP
 ```
 
-### 3. تشغيل المشروع
+### 3. Run Development Server
 
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
 ```
 
-افتح المتصفح على [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## البناء للإنتاج
+### 4. Build for Production
 
 ```bash
 npm run build
 npm start
 ```
 
-## هيكل المشروع
+## 📁 Project Structure
 
 ```
 maksaby-frontend/
 ├── app/
+│   ├── page.tsx              # Landing page with features showcase
 │   ├── auth/
-│   │   ├── login/         # صفحة تسجيل الدخول
-│   │   └── register/      # صفحة إنشاء حساب
+│   │   ├── login/            # Login page
+│   │   ├── register/         # Registration page
+│   │   ├── forgot-password/  # Password recovery
+│   │   ├── reset-password/   # Password reset
+│   │   └── welcome/          # Welcome page after registration
 │   ├── dashboard/
-│   │   ├── page.tsx       # لوحة التحكم
-│   │   ├── products/      # صفحات المنتجات
-│   │   ├── orders/        # صفحات الطلبات
-│   │   ├── customers/     # صفحات العملاء
-│   │   ├── expenses/      # صفحات المصروفات
-│   │   ├── stock/         # صفحات المخزون
-│   │   └── reports/       # صفحات التقارير
-│   ├── layout.tsx         # الـ Layout الرئيسي
-│   └── globals.css        # الأنماط العامة
+│   │   ├── page.tsx          # Main dashboard
+│   │   ├── products/         # Products management
+│   │   ├── orders/           # Orders management
+│   │   ├── customers/        # Customers management
+│   │   ├── expenses/         # Expenses tracking
+│   │   ├── stock/            # Stock movements
+│   │   ├── notes/            # Notes management
+│   │   └── settings/         # User settings
+│   ├── api/                  # API route handlers
+│   ├── layout.tsx            # Root layout
+│   └── globals.css           # Global styles
 ├── components/
-│   ├── ui/                # مكونات shadcn/ui
-│   ├── dashboard-sidebar.tsx
-│   └── providers.tsx
+│   ├── ui/                   # shadcn/ui components
+│   ├── dashboard-sidebar.tsx # Sidebar navigation
+│   ├── *-form-dialog.tsx     # Form dialogs for entities
+│   ├── confirm-dialog.tsx    # Confirmation dialog
+│   └── providers.tsx         # App providers
 ├── lib/
-│   ├── api-client.ts      # Axios configuration
-│   ├── utils.ts           # وظائف مساعدة
-│   └── translations.ts    # الترجمات العربية
+│   ├── api-client.ts         # Axios configuration
+│   ├── utils.ts              # Utility functions
+│   └── translations.ts       # Arabic translations
 ├── hooks/
-│   └── use-auth.ts        # Hook المصادقة
+│   └── use-auth.ts           # Authentication hook
 ├── types/
-│   └── index.ts           # TypeScript types
-└── package.json
+│   └── index.ts              # TypeScript type definitions
+└── public/
+    └── logo.png              # App logo
 ```
 
-## الواجهة الخلفية (Backend API)
+## 🔌 Backend API Requirements
 
-يحتاج المشروع إلى API مبني بـ .NET 8 مع Endpoints التالية:
+This frontend requires a .NET 8 backend API with the following endpoints:
 
 ### Authentication
-- `POST /api/auth/login` - تسجيل الدخول
-- `POST /api/auth/register` - إنشاء حساب
+- `POST /api/Auth/login` - User login
+- `POST /api/Auth/register` - User registration
+- `POST /api/Auth/forgot-password` - Request password reset
+- `POST /api/Auth/reset-password` - Reset password with OTP
 
 ### Products
-- `GET /api/products` - الحصول على كل المنتجات
-- `POST /api/products` - إضافة منتج
-- `PUT /api/products/{id}` - تعديل منتج
-- `DELETE /api/products/{id}` - حذف منتج
+- `GET /api/Products` - Get all products (with pagination)
+- `GET /api/Products/{id}` - Get product by ID
+- `POST /api/Products` - Create new product
+- `PUT /api/Products/{id}` - Update product
+- `DELETE /api/Products/{id}` - Delete product
 
 ### Orders
-- `GET /api/orders` - الحصول على كل الطلبات
-- `POST /api/orders` - إنشاء طلب جديد
-- `GET /api/orders/{id}` - تفاصيل طلب
+- `GET /api/Orders` - Get all orders
+- `GET /api/Orders/{id}` - Get order details
+- `POST /api/Orders` - Create new order
+- `PUT /api/Orders/{id}` - Update order
+- `GET /api/Orders/customer/{customerId}` - Get customer orders
 
 ### Customers
-- `GET /api/customers` - الحصول على كل العملاء
-- `POST /api/customers` - إضافة عميل
-- `PUT /api/customers/{id}` - تعديل عميل
+- `GET /api/Customers` - Get all customers
+- `GET /api/Customers/{id}` - Get customer by ID
+- `POST /api/Customers` - Create new customer
+- `PUT /api/Customers/{id}` - Update customer
+- `DELETE /api/Customers/{id}` - Delete customer
 
 ### Expenses
-- `GET /api/expenses` - الحصول على كل المصروفات
-- `POST /api/expenses` - إضافة مصروف
+- `GET /api/Expenses` - Get all expenses
+- `GET /api/Expenses/{id}` - Get expense by ID
+- `POST /api/Expenses` - Create new expense
+- `PUT /api/Expenses/{id}` - Update expense
+- `DELETE /api/Expenses/{id}` - Delete expense
 
 ### Stock Movements
-- `GET /api/stockmovements` - الحصول على حركات المخزون
-- `POST /api/stockmovements` - إضافة حركة مخزون
+- `GET /api/StockMovements` - Get stock movement history
+- `POST /api/StockMovements` - Record stock movement
+
+### Notes
+- `GET /api/Notes` - Get all notes
+- `GET /api/Notes/customer/{customerId}` - Get customer notes
+- `POST /api/Notes` - Create new note
+- `PUT /api/Notes/{id}` - Update note
+- `DELETE /api/Notes/{id}` - Delete note
+- `PUT /api/Notes/{id}/toggle` - Toggle note visibility
 
 ### Dashboard
-- `GET /api/dashboard/metrics` - إحصائيات لوحة التحكم
+- `GET /api/Dashboard/metrics` - Get dashboard metrics and statistics
 
-## الترخيص
+### User Profile
+- `GET /api/User/profile` - Get user profile
+- `PUT /api/User/profile` - Update user profile
+
+## 📧 Contact
+
+For support or inquiries: maksaby.business@gmail.com
+
+## 📄 License
 
 MIT License
 
-## المطور
+## 🙏 Acknowledgments
 
-تم التطوير بواسطة Copilot
+Built with modern web technologies and best practices for performance and user experience.
