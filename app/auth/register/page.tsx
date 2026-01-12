@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 
 const registerSchema = z.object({
@@ -48,6 +48,10 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
+          <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4">
+            <ArrowRight className="h-4 w-4" />
+            <span className="text-sm">العودة للصفحة الرئيسية</span>
+          </Link>
           <div className="flex justify-center mb-4">
             <Image src="/logo.png" alt="مكسبي" width={200} height={80} priority />
           </div>
