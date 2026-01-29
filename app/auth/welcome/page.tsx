@@ -9,6 +9,7 @@ import { UpdateProfileFormData } from '@/types'
 import toast from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Upload, ArrowLeft, Loader2, CheckCircle, User } from 'lucide-react'
 import Image from 'next/image'
 import Cookies from 'js-cookie'
@@ -115,7 +116,10 @@ export default function WelcomePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-purple-50 to-pink-50 p-4 animate-in fade-in duration-500">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-blue-950 dark:to-purple-950 p-4 animate-in fade-in duration-500">
+      <div className="absolute top-4 left-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-lg animate-in slide-in-from-bottom duration-700">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg animate-in zoom-in duration-500 delay-200">

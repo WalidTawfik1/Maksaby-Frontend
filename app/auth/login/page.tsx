@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -10,8 +10,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Eye, EyeOff, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
+import { useTheme } from 'next-themes'
 
 const loginSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صحيح'),
@@ -22,8 +24,17 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const { login } = useAuth()
+  const { theme, resolvedTheme } = useTheme()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const currentTheme = mounted ? (resolvedTheme || theme) : 'light'
+  const logoSrc = currentTheme === 'dark' ? '/logodark.png' : '/logo.png'
 
   const {
     register,
@@ -45,7 +56,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-blue-950 dark:to-gray-900 p-4">
+      <div className="absolute top-4 left-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4">
@@ -53,7 +67,7 @@ export default function LoginPage() {
             <span className="text-sm">العودة للصفحة الرئيسية</span>
           </Link>
           <div className="flex justify-center mb-4">
-            <Image src="/logo.png" alt="مكسبي" width={200} height={80} priority />
+            <Image src={logoSrc} alt="مكسبي" width={200} height={80} priority />
           </div>
           <CardDescription className="text-lg">
             مرحباً بعودتك! سجل دخولك للمتابعة

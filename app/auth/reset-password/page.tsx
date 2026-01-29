@@ -11,8 +11,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { ArrowRight, Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
+import { useTheme } from 'next-themes'
 
 const resetPasswordSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صحيح'),
@@ -66,7 +68,10 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-blue-950 dark:to-gray-900 p-4">
+      <div className="absolute top-4 left-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <Link
@@ -77,7 +82,7 @@ function ResetPasswordForm() {
             العودة إلى تسجيل الدخول
           </Link>
           <div className="flex justify-center mb-4">
-            <Image src="/logo.png" alt="مكسبي" width={180} height={70} />
+            <Image src={logoSrc} alt="مكسبي" width={180} height={70} />
           </div>
           <CardTitle className="text-2xl font-bold text-primary">إعادة تعيين كلمة المرور</CardTitle>
           <CardDescription className="text-base">
@@ -182,7 +187,7 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-blue-950 dark:to-gray-900 p-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-muted-foreground">جاري التحميل...</p>

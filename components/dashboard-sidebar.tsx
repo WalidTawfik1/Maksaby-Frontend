@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { useQuery } from '@tanstack/react-query'
 import { getUserProfile } from '@/lib/api-client'
 
@@ -80,7 +81,7 @@ export function DashboardSidebar() {
   return (
     <div className="flex h-full w-64 flex-col bg-card/80 backdrop-blur-xl border-l border-border/50 shadow-2xl">
       {/* User Profile Logo */}
-      <div className="flex h-20 items-center justify-center border-b border-border/50 px-4 bg-gradient-to-b from-primary/5 to-transparent">
+      <div className="flex h-20 items-center justify-between border-b border-border/50 px-4 bg-gradient-to-b from-primary/5 to-transparent">
         <div className="relative h-14 w-14 rounded-full overflow-hidden border-2 border-primary/30 shadow-lg">
           {profile?.logoUrl ? (
             <Image 
@@ -97,6 +98,7 @@ export function DashboardSidebar() {
             </div>
           )}
         </div>
+        <ThemeToggle />
       </div>
 
       {/* Navigation */}
