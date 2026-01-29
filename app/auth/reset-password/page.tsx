@@ -32,9 +32,18 @@ function ResetPasswordForm() {
   const { resetPassword } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { theme, resolvedTheme } = useTheme()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const currentTheme = mounted ? (resolvedTheme || theme) : 'light'
+  const logoSrc = currentTheme === 'dark' ? '/logodark.png' : '/logo.png'
 
   const {
     register,
