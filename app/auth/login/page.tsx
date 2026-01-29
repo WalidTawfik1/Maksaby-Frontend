@@ -125,8 +125,8 @@ export default function LoginPage() {
           </form>
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">ليس لديك حساب؟ </span>
-            <Link href="/auth/register" className="text-primary hover:underline font-medium">
-              إنشاء حساب جديد
+            <Link href="/" className="text-primary hover:underline font-medium">
+              احصل على حساب تجريبي مجاني
             </Link>
           </div>
         </CardContent>

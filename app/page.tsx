@@ -8,11 +8,16 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useTheme } from 'next-themes'
+import { Input } from '@/components/ui/input'
+import { requestDemo } from '@/lib/api-client'
+import toast from 'react-hot-toast'
 
 export default function Home() {
   const router = useRouter()
   const { theme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [demoEmail, setDemoEmail] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -21,6 +26,43 @@ export default function Home() {
       router.push('/dashboard')
     }
   }, [router])
+
+  const handleDemoRequest = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!demoEmail || !demoEmail.includes('@')) {
+      toast.error('الرجاء إدخال بريد إلكتروني صحيح')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const response = await requestDemo(demoEmail)
+      if (response.isSuccess) {
+        toast.success(`تم إنشاء حساب تجريبي بنجاح! تم إرسال بيانات الدخول إلى ${demoEmail}`)
+        setDemoEmail('')
+      } else {
+        const errorMsg = response.errors?.[0]
+        // Translate common error messages
+        if (errorMsg?.toLowerCase().includes('already have an active demo')) {
+          toast.error('لديك بالفعل حساب تجريبي نشط. يرجى التحقق من بريدك الإلكتروني للحصول على بيانات الدخول.')
+        } else {
+          toast.error(errorMsg || 'فشل طلب الحساب التجريبي')
+        }
+      }
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.errors?.[0] || error?.response?.data?.message
+      
+      // Translate common error messages
+      if (errorMsg?.toLowerCase().includes('already have an active demo')) {
+        toast.error('لديك بالفعل حساب تجريبي نشط. يرجى التحقق من بريدك الإلكتروني للحصول على بيانات الدخول.')
+      } else {
+        toast.error(errorMsg || 'حدث خطأ أثناء طلب الحساب التجريبي')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const currentTheme = mounted ? (resolvedTheme || theme) : 'light'
   const logoSrc = currentTheme === 'dark' ? '/logodark.png' : '/logo.png'
@@ -35,10 +77,7 @@ export default function Home() {
           <div className="flex gap-4 items-center">
             <ThemeToggle />
             <Link href="/auth/login">
-              <Button variant="ghost">تسجيل الدخول</Button>
-            </Link>
-            <Link href="/auth/register">
-              <Button>ابدأ الآن مجاناً</Button>
+              <Button>تسجيل الدخول</Button>
             </Link>
           </div>
         </div>
@@ -54,11 +93,65 @@ export default function Home() {
             نظام متكامل لإدارة المخزون والطلبات والعملاء - صمم خصيصاً للمحلات التجارية
             مع دعم كامل للغة العربية
           </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/auth/register">
-              <Button size="lg" className="text-2xl px-12 py-7">
-                ابدأ مجاناً الآن
-              </Button>
+          
+          {/* Demo Request Form */}
+          <div className="max-w-md mx-auto mb-4">
+            <Card className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 border-primary/20">
+              <div className="mb-4">
+                <h3 className="text-2xl font-bold text-foreground mb-2">
+                  جرب النظام مجاناً لمدة 7 أيام
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  احصل على حساب تجريبي كامل المميزات - سنرسل لك بيانات الدخول على بريدك الإلكتروني
+                </p>
+              </div>
+              <form onSubmit={handleDemoRequest} className="space-y-3">
+                <Input
+                  type="email"
+                  placeholder="بريدك الإلكتروني"
+                  value={demoEmail}
+                  onChange={(e) => setDemoEmail(e.target.value)}
+                  disabled={isSubmitting}
+                  required
+                  className="text-lg h-12"
+                />
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="w-full text-lg"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'جاري الإرسال...' : 'احصل على حساب تجريبي مجاني'}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  لا حاجة لبطاقة ائتمان • جاهز للاستخدام فوراً
+                </p>
+              </form>
+            </Card>
+          </div>
+
+          {/* Full Account Contact Info */}
+          <div className="max-w-md mx-auto mb-4">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-sm text-center text-foreground mb-2">
+                <span className="font-semibold">تريد حساباً كاملاً دائماً؟</span>
+              </p>
+              <p className="text-sm text-center text-muted-foreground">
+                تواصل معنا عبر{' '}
+                <a 
+                  href="mailto:maksaby.business@gmail.com" 
+                  className="text-primary hover:underline font-medium"
+                >
+                  maksaby.business@gmail.com
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 justify-center items-center text-sm text-muted-foreground">
+            <span>لديك حساب بالفعل؟</span>
+            <Link href="/auth/login" className="text-primary hover:underline font-medium">
+              تسجيل الدخول
             </Link>
           </div>
         </div>
@@ -218,18 +311,18 @@ export default function Home() {
             </div>
 
             <div className="bg-card border border-border p-8 rounded-2xl shadow-xl">
-              <h3 className="text-2xl font-bold mb-6 text-center text-foreground">ابدأ اليوم مجاناً</h3>
+              <h3 className="text-2xl font-bold mb-6 text-center text-foreground">جرب مكسبي الآن</h3>
               <div className="space-y-4">
                 <div className="text-center pb-4 border-b border-border">
-                  <div className="text-4xl font-bold text-primary mb-2">مجاني</div>
-                  <p className="text-muted-foreground">للبدء والتجربة</p>
+                  <div className="text-4xl font-bold text-primary mb-2">7 أيام</div>
+                  <p className="text-muted-foreground">تجربة مجانية كاملة</p>
                 </div>
                 <ul className="space-y-3">
                   <li className="flex gap-3 items-center">
                     <svg className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-foreground">جميع المميزات الأساسية</span>
+                    <span className="text-foreground">جميع المميزات متاحة</span>
                   </li>
                   <li className="flex gap-3 items-center">
                     <svg className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,14 +340,19 @@ export default function Home() {
                     <svg className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-foreground">دعم فني متواصل</span>
+                    <span className="text-foreground">جاهز للاستخدام فوراً</span>
                   </li>
                 </ul>
-                <Link href="/auth/register" className="block w-full">
-                  <Button size="lg" className="w-full mt-6">
-                    إنشاء حساب مجاني
-                  </Button>
-                </Link>
+                <div className="pt-4">
+                  <p className="text-sm text-muted-foreground text-center mb-3">
+                    سنرسل لك بيانات الدخول على بريدك الإلكتروني
+                  </p>
+                  <a href="#hero" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                    <Button size="lg" className="w-full">
+                      احصل على حساب تجريبي
+                    </Button>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -265,17 +363,17 @@ export default function Home() {
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center max-w-3xl">
           <h2 className="text-4xl font-bold mb-6">
-            هل أنت مستعد لتطوير إدارة متجرك؟
+            جرب مكسبي مجاناً لمدة 7 أيام
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            انضم إلى مئات التجار الذين يثقون في مكسبي لإدارة أعمالهم
+            اختبر جميع المميزات بدون الحاجة لبطاقة ائتمان
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/auth/register">
+            <a href="#hero" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
               <Button size="lg" variant="secondary" className="text-lg px-8">
-                ابدأ الآن مجاناً
+                احصل على حساب تجريبي
               </Button>
-            </Link>
+            </a>
             <Link href="/auth/login">
               <Button size="lg" variant="outline" className="text-lg px-8 border-white bg-transparent text-white hover:bg-white hover:text-primary dark:border-gray-300">
                 لدي حساب بالفعل
@@ -299,7 +397,6 @@ export default function Home() {
               <h4 className="font-bold text-white mb-4">روابط سريعة</h4>
               <ul className="space-y-2">
                 <li><Link href="/auth/login" className="hover:text-white transition-colors">تسجيل الدخول</Link></li>
-                <li><Link href="/auth/register" className="hover:text-white transition-colors">إنشاء حساب</Link></li>
               </ul>
             </div>
             <div>

@@ -567,3 +567,24 @@ export const updateUserProfile = async (data: UpdateProfileFormData) => {
   
   return response.data
 }
+
+// ==========================
+// Demo Account API Functions
+// ==========================
+
+export interface RequestDemoRequest {
+  email: string
+}
+
+export interface RequestDemoResponse {
+  message: string
+  userEmail: string
+}
+
+/**
+ * Request a demo account
+ */
+export const requestDemo = async (email: string) => {
+  const response = await apiClient.post<ApiResponse<RequestDemoResponse>>('/Auth/request-demo', { email })
+  return response.data
+}
