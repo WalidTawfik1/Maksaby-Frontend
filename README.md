@@ -13,6 +13,8 @@
 - Product statistics and inventory status
 - Customer engagement overview
 - Low stock alerts
+- COGS (Cost of Goods Sold) tracking
+- Total expenses metrics
 
 ### 📦 Inventory Management
 - Add, edit, and delete products with image upload
@@ -20,40 +22,67 @@
 - Stock movement tracking (IN/OUT)
 - Low stock notifications
 - Product categorization
+- Pagination support for efficient data loading
 
 ### 🛒 Order Management
 - Create POS orders with automatic profit calculation
 - Order status tracking (Completed, Pending, Cancelled)
 - Customer order history
 - Detailed order breakdown with costs and profits
+- Pagination for better performance
+- Automatic cache invalidation on order creation
 
 ### 👥 Customer Management
 - Comprehensive customer directory
 - Contact information management
 - Purchase history tracking
 - Customer-specific notes
+- Pagination for large customer databases
 
 ### 💰 Expense Tracking
 - Record expenses by different categories
 - Track business costs for accurate profit calculation
 - Expense history and reports
+- Pagination for expense records
 
 ### 📝 Notes Management
 - Create and manage notes for customers and orders
 - Keep important business information organized
 - Toggle visibility and priority
+- Search functionality
+- Pagination support
 
 ### 🔐 Authentication & Security
 - JWT-based secure authentication
 - Multi-tenant support
 - Protected routes and API calls
-- User profile management
+- User profile management with image upload
+- Password recovery with OTP verification
+- Password reset functionality
+- Token-based auto-login from homepage
+
+### 🎨 Theme Support
+- **Dark Mode** - Full dark mode implementation with system preference detection
+- Smooth theme transitions
+- Persistent theme selection
+- Support across all pages and components
 
 ### 🌐 Arabic-First Design
 - Full RTL (Right-to-Left) support
 - Arabic UI throughout the application
 - Cairo font for beautiful Arabic typography
 - Localized error messages and notifications
+
+### 🏠 Enhanced Homepage
+- Feature showcase sections
+- Navigation to authentication pages
+- Demo account request functionality
+- Automatic dashboard redirect for authenticated users
+
+### 🎭 Demo Access
+- Request demo account functionality
+- Easy onboarding for potential users
+- Automatic account provisioning
 
 ## 🛠️ Tech Stack
 
@@ -67,6 +96,7 @@
 - **Axios** - HTTP client
 - **Lucide React** - Icon library
 - **Cairo Font** - Arabic typography
+- **next-themes** - Dark mode implementation
 
 ### Analytics & Monitoring
 - **Vercel Analytics** - Performance monitoring
@@ -127,27 +157,29 @@ maksaby-frontend/
 │   ├── page.tsx              # Landing page with features showcase
 │   ├── auth/
 │   │   ├── login/            # Login page
-│   │   ├── register/         # Registration page
+│   │   ├── register/         # Registration page (redirects to home)
 │   │   ├── forgot-password/  # Password recovery
-│   │   ├── reset-password/   # Password reset
-│   │   └── welcome/          # Welcome page after registration
+│   │   ├── reset-password/   # Password reset with theme support
+│   │   └── welcome/          # Welcome page with profile upload
 │   ├── dashboard/
-│   │   ├── page.tsx          # Main dashboard
-│   │   ├── products/         # Products management
-│   │   ├── orders/           # Orders management
-│   │   ├── customers/        # Customers management
-│   │   ├── expenses/         # Expenses tracking
+│   │   ├── page.tsx          # Main dashboard with COGS and expenses
+│   │   ├── products/         # Products management with pagination
+│   │   ├── orders/           # Orders management with pagination
+│   │   ├── customers/        # Customers management with pagination
+│   │   ├── expenses/         # Expenses tracking with pagination
 │   │   ├── stock/            # Stock movements
-│   │   ├── notes/            # Notes management
-│   │   └── settings/         # User settings
+│   │   ├── notes/            # Notes management with search & pagination
+│   │   └── settings/         # User settings and profile
 │   ├── api/                  # API route handlers
-│   ├── layout.tsx            # Root layout
-│   └── globals.css           # Global styles
+│   ├── layout.tsx            # Root layout with theme provider
+│   └── globals.css           # Global styles with dark mode variables
 ├── components/
 │   ├── ui/                   # shadcn/ui components
 │   ├── dashboard-sidebar.tsx # Sidebar navigation
 │   ├── *-form-dialog.tsx     # Form dialogs for entities
 │   ├── confirm-dialog.tsx    # Confirmation dialog
+│   ├── theme-provider.tsx    # Theme context provider
+│   ├── theme-toggle.tsx      # Dark mode toggle button
 │   └── providers.tsx         # App providers
 ├── lib/
 │   ├── api-client.ts         # Axios configuration
@@ -173,6 +205,7 @@ This frontend requires a .NET 8 backend API with the following endpoints:
 
 ### Products
 - `GET /api/Products` - Get all products (with pagination)
+- `GET /api/Products/no-pagination` - Get all products without pagination
 - `GET /api/Products/{id}` - Get product by ID
 - `POST /api/Products` - Create new product
 - `PUT /api/Products/{id}` - Update product
@@ -222,7 +255,21 @@ This frontend requires a .NET 8 backend API with the following endpoints:
 
 For support or inquiries: maksaby.business@gmail.com
 
-## 📄 License
+## 📝 Recent Updates
+
+### Latest Features (January 2026)
+- ✅ **Dark Mode**: Full theme switching with system preference detection
+- ✅ **Demo Account**: Request demo access functionality
+- ✅ **Enhanced Homepage**: Improved navigation and feature showcase
+- ✅ **Pagination**: Implemented across all major sections (customers, orders, expenses, notes)
+- ✅ **Dashboard Enhancements**: Added COGS and total expenses metrics
+- ✅ **Welcome Page**: User profile upload with animations
+- ✅ **Password Reset**: Theme-aware password reset form
+- ✅ **Analytics Integration**: Vercel Analytics and Speed Insights
+- ✅ **Auto-redirect**: Token-based authentication from homepage
+- ✅ **Performance**: Cache invalidation and optimized data fetching
+
+## �📄 License
 
 MIT License
 
