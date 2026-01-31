@@ -132,7 +132,7 @@ export default function Home() {
 
           {/* Full Account Contact Info */}
           <div className="max-w-md mx-auto mb-4">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="rainbow-border bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-4">
               <p className="text-sm text-center text-foreground mb-2">
                 <span className="font-semibold">تريد حساباً كاملاً دائماً؟</span>
               </p>

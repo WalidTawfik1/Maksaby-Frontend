@@ -91,6 +91,48 @@
   direction: rtl;
 }
 
+/* Rainbow moving border animation */
+@keyframes rainbow-border {
+  0% {
+    border-color: #ff0080;
+    box-shadow: 0 0 20px rgba(255, 0, 128, 0.5);
+  }
+  14% {
+    border-color: #ff8c00;
+    box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
+  }
+  28% {
+    border-color: #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  }
+  42% {
+    border-color: #00ff00;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+  }
+  57% {
+    border-color: #00bfff;
+    box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+  }
+  71% {
+    border-color: #4b0082;
+    box-shadow: 0 0 20px rgba(75, 0, 130, 0.5);
+  }
+  85% {
+    border-color: #9400d3;
+    box-shadow: 0 0 20px rgba(148, 0, 211, 0.5);
+  }
+  100% {
+    border-color: #ff0080;
+    box-shadow: 0 0 20px rgba(255, 0, 128, 0.5);
+  }
+}
+
+.rainbow-border {
+  position: relative;
+  border: 3px solid;
+  animation: rainbow-border 3s linear infinite;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
