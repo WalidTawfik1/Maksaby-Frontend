@@ -192,14 +192,15 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
       return
     }
 
-    if (discount < 0 || discount > 100) {
+    const discountValue = typeof discount === 'number' ? discount : parseFloat(discount as string) || 0
+    if (discountValue < 0 || discountValue > 100) {
       toast.error('يرجى إدخال نسبة خصم صحيحة (0-100)')
       return
     }
 
     const orderData: CreateOrderRequest = {
       customerId: customerId || undefined,
-      discount: discount || undefined,
+      discount: discountValue || undefined,
       notes: notes || undefined,
       orderItems: orderItems.map(item => ({
         productId: item.productId,
