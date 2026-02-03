@@ -99,6 +99,8 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
           id: expense.id,
           title: title.trim(),
           category: category.trim() || null,
+          amount: parseFloat(amount),
+          productId: productId || null,
           supplierId: supplierId || null,
         }
       : {
@@ -106,9 +108,7 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
           category: category.trim() || null,
           amount: parseFloat(amount),
           productId: productId || null,
-          supplierId: supplier.trim() || null,
-          amount: parseFloat(amount),
-          productId: productId || null,
+          supplierId: supplierId || null,
         }
 
     mutation.mutate(data)
