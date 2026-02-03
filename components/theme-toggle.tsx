@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
   // Prevent hydration mismatch
@@ -21,8 +21,9 @@ export function ThemeToggle() {
         size="icon"
         className="h-9 w-9"
         aria-label="Toggle theme"
+        suppressHydrationWarning
       >
-        <Sun className="h-5 w-5" />
+        <div className="h-5 w-5" />
       </Button>
     )
   }
@@ -31,11 +32,12 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
       className="h-9 w-9 transition-all duration-200 hover:bg-accent hover:text-accent-foreground"
-      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+      suppressHydrationWarning
     >
-      {theme === 'dark' ? (
+      {resolvedTheme === 'dark' ? (
         <Sun className="h-5 w-5 rotate-0 scale-100 transition-all duration-300" />
       ) : (
         <Moon className="h-5 w-5 rotate-0 scale-100 transition-all duration-300" />

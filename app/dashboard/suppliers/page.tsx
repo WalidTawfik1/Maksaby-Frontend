@@ -50,7 +50,7 @@ export default function SuppliersPage() {
     return (
       supplier.name.toLowerCase().includes(search) ||
       supplier.phone.toLowerCase().includes(search) ||
-      supplier.email?.toLowerCase().includes(search)
+      supplier.address?.toLowerCase().includes(search)
     )
   })
 
@@ -185,7 +185,7 @@ export default function SuppliersPage() {
                   <tr className="border-b">
                     <th className="text-right py-3 px-4 font-medium">اسم المورد</th>
                     <th className="text-right py-3 px-4 font-medium">رقم الهاتف</th>
-                    <th className="text-right py-3 px-4 font-medium">البريد الإلكتروني</th>
+                    <th className="text-right py-3 px-4 font-medium">العنوان</th>
                     <th className="text-right py-3 px-4 font-medium">إجمالي المشتريات</th>
                     <th className="text-right py-3 px-4 font-medium">تاريخ الإضافة</th>
                     <th className="text-right py-3 px-4 font-medium">الإجراءات</th>
@@ -199,7 +199,7 @@ export default function SuppliersPage() {
                         {supplier.phone}
                       </td>
                       <td className="py-3 px-4">
-                        {supplier.email || '-'}
+                        {supplier.address || '-'}
                       </td>
                       <td className="py-3 px-4">
                         {formatCurrency(supplier.totalPurchased)}

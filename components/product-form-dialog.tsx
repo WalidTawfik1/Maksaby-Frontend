@@ -68,7 +68,9 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
   const mutation = useMutation({
     mutationFn: async (data: ProductFormData) => {
       if (product) {
-        return await updateProduct(data)
+        // Remove supplierId when updating to prevent supplier changes
+        const { supplierId, ...updateData } = data
+        return await updateProduct(updateData)
       } else {
         return await addProduct(data)
       }
@@ -212,27 +214,29 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
             />
           </div>
 
-          {/* Supplier */}
-          <div className="space-y-2">
-            <Label htmlFor="supplier" className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-blue-600" />
-              المورد (اختياري)
-            </Label>
-            <select
-              id="supplier"
-              value={formData.supplierId}
-              onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
-              className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              disabled={mutation.isPending}
-            >
-              <option value="">بدون مورد</option>
-              {suppliers.map((supplier) => (
-                <option key={supplier.id} value={supplier.id}>
-                  {supplier.name} - {supplier.phone}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Supplier - Only show when adding new product */}
+          {!product && (
+            <div className="space-y-2">
+              <Label htmlFor="supplier" className="flex items-center gap-2">
+                <Truck className="h-4 w-4 text-blue-600" />
+                المورد (اختياري)
+              </Label>
+              <select
+                id="supplier"
+                value={formData.supplierId}
+                onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
+                className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                disabled={mutation.isPending}
+              >
+                <option value="">بدون مورد</option>
+                {suppliers.map((supplier) => (
+                  <option key={supplier.id} value={supplier.id}>
+                    {supplier.name} - {supplier.phone}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Image Upload */}
           <div className="space-y-2">
