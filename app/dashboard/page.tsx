@@ -217,8 +217,11 @@ export default function DashboardPage() {
                     <line x1="12" y1="17" x2="12.01" y2="17"/>
                   </svg>
                 </div>
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-48 text-center z-50 whitespace-nowrap">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-56 text-center z-50">
                   النقد الأولي + المبيعات - المصروفات
+                  <div className="mt-1 pt-1 border-t border-border text-muted-foreground">
+                    انتقل إلى الإعدادات لتعديل النقد الأولي
+                  </div>
                 </div>
               </div>
             </div>
