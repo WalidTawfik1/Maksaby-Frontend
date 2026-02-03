@@ -179,7 +179,8 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal()
-    const discountAmount = (subtotal * discount) / 100
+    const discountValue = typeof discount === 'number' ? discount : parseFloat(discount as string) || 0
+    const discountAmount = (subtotal * discountValue) / 100
     return subtotal - discountAmount
   }
 
