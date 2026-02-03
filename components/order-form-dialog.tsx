@@ -527,14 +527,14 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
                   </span>
                   <span className="font-semibold text-lg">{formatCurrency(calculateSubtotal())}</span>
                 </div>
-                {discount > 0 && (
+                {((typeof discount === 'number' ? discount : parseFloat(discount as string) || 0) > 0) && (
                   <div className="flex justify-between items-center bg-orange-100 dark:bg-orange-900/30 -mx-6 px-6 py-2">
                     <span className="text-orange-700 dark:text-orange-300 flex items-center gap-2">
                       <Tag className="h-4 w-4" />
                       الخصم ({discount}%):
                     </span>
                     <span className="font-bold text-orange-600 dark:text-orange-400">
-                      -{formatCurrency((calculateSubtotal() * discount) / 100)}
+                      -{formatCurrency((calculateSubtotal() * (typeof discount === 'number' ? discount : parseFloat(discount as string) || 0)) / 100)}
                     </span>
                   </div>
                 )}
