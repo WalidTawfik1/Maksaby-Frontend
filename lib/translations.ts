@@ -44,6 +44,14 @@ const apiMessageTranslations: Record<string, string> = {
   // Profile messages
   'Profile retrieved successfully.': 'تم استرجاع الملف الشخصي بنجاح',
   'Profile updated successfully.': 'تم تحديث الملف الشخصي بنجاح',
+  
+  // Supplier messages
+  'Supplier added successfully.': 'تم إضافة المورد بنجاح',
+  'Suppliers retrieved successfully.': 'تم استرجاع الموردين بنجاح',
+  'Supplier retrieved successfully.': 'تم استرجاع المورد بنجاح',
+  'Supplier updated successfully.': 'تم تحديث المورد بنجاح',
+  'Supplier deleted successfully.': 'تم حذف المورد بنجاح',
+  'Supplier not found': 'المورد غير موجود',
 }
 
 // Helper function to translate API messages
@@ -57,6 +65,7 @@ export const translations = {
   products: 'المنتجات',
   orders: 'الطلبات',
   customers: 'العملاء',
+  suppliers: 'الموردين',
   expenses: 'المصروفات',
   stock: 'المخزون',
   notes: 'الملاحظات',
@@ -68,6 +77,10 @@ export const translations = {
   netProfit: 'صافي الربح',
   productsCount: 'عدد المنتجات',
   customersCount: 'عدد العملاء',
+  currentCash: 'النقد الحالي',
+  initialCash: 'النقد الأولي',
+  totalExpenses: 'إجمالي المصروفات',
+  costOfGoodsSold: 'تكلفة البضاعة المباعة',
   revenueVsProfit: 'الإيرادات مقابل الأرباح',
   topProducts: 'أفضل المنتجات',
   recentOrders: 'الطلبات الأخيرة',
@@ -96,6 +109,19 @@ export const translations = {
   addCustomer: 'إضافة عميل',
   customerName: 'اسم العميل',
   phone: 'رقم الهاتف',
+  
+  // Suppliers
+  addSupplier: 'إضافة مورد',
+  editSupplier: 'تعديل مورد',
+  deleteSupplier: 'حذف مورد',
+  supplierName: 'اسم المورد',
+  supplierPhone: 'رقم هاتف المورد',
+  supplierEmail: 'بريد المورد الإلكتروني',
+  supplierAddress: 'عنوان المورد',
+  totalPurchased: 'إجمالي المشتريات',
+  selectSupplier: 'اختر المورد',
+  supplier: 'المورد',
+  supplierOptional: 'المورد (اختياري)',
   customerEmail: 'البريد الإلكتروني',
   address: 'العنوان',
   totalSpent: 'إجمالي المشتريات',

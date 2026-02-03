@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, ExpensesResponse, CreateExpenseRequest, UpdateExpenseRequest, Note, CreateNoteRequest, UpdateNoteRequest, UserProfile, UpdateProfileFormData } from '@/types'
+import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, ExpensesResponse, CreateExpenseRequest, UpdateExpenseRequest, Note, CreateNoteRequest, UpdateNoteRequest, UserProfile, UpdateProfileFormData, Supplier, CreateSupplierRequest, UpdateSupplierRequest } from '@/types'
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -102,6 +102,10 @@ export const addProduct = async (data: ProductFormData) => {
     formData.append('Description', data.description)
   }
   
+  if (data.supplierId) {
+    formData.append('SupplierId', data.supplierId)
+  }
+  
   const response = await apiClient.post<ApiResponse<Product>>('/Product/addproduct', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -132,6 +136,10 @@ export const updateProduct = async (data: ProductFormData) => {
   
   if (data.description) {
     formData.append('Description', data.description)
+  }
+  
+  if (data.supplierId) {
+    formData.append('SupplierId', data.supplierId)
   }
   
   const response = await apiClient.patch<ApiResponse<boolean>>('/Product/updateproduct', formData, {
@@ -456,6 +464,28 @@ export const deleteExpense = async (expenseId: string) => {
   return response.data
 }
 
+/**
+ * Get expenses by supplier ID
+ */
+export const getExpensesBySupplier = async (
+  supplierId: string,
+  pageNum: number = 1,
+  pageSize: number = 10
+) => {
+  const response = await apiClient.get<ApiResponse<ExpensesResponse>>(
+    `/Expense/getallexpensesbysupplier`,
+    {
+      params: {
+        supplierId,
+        pagenum: pageNum,
+        Maxpagesize: pageSize,
+        pagesize: pageSize,
+      },
+    }
+  )
+  return response.data
+}
+
 // ==========================
 // Note API Functions
 // ==========================
@@ -559,6 +589,10 @@ export const updateUserProfile = async (data: UpdateProfileFormData) => {
     formData.append('Logo', data.logo)
   }
   
+  if (data.initialCash !== undefined) {
+    formData.append('InitialCash', data.initialCash.toString())
+  }
+  
   const response = await apiClient.patch<ApiResponse<boolean>>('/User/updateprofile', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -586,5 +620,68 @@ export interface RequestDemoResponse {
  */
 export const requestDemo = async (email: string) => {
   const response = await apiClient.post<ApiResponse<RequestDemoResponse>>('/Auth/request-demo', { email })
+  return response.data
+}
+
+// ==========================
+// Supplier API Functions
+// ==========================
+
+/**
+ * Get all suppliers
+ */
+export const getAllSuppliers = async () => {
+  const response = await apiClient.get<ApiResponse<Supplier[]>>('/Supplier/getallsuppliers')
+  return response.data
+}
+
+/**
+ * Get a single supplier by ID
+ */
+export const getSupplierById = async (supplierId: string) => {
+  const response = await apiClient.get<ApiResponse<Supplier>>(`/Supplier/getsupplierbyid/${supplierId}`)
+  return response.data
+}
+
+/**
+ * Add a new supplier
+ */
+export const addSupplier = async (data: CreateSupplierRequest) => {
+  const payload = {
+    name: data.name,
+    phone: data.phone,
+    email: data.email || undefined,
+    address: data.address || undefined,
+  }
+  
+  const response = await apiClient.post<ApiResponse<Supplier>>('/Supplier/addsupplier', payload)
+  return response.data
+}
+
+/**
+ * Update an existing supplier
+ */
+export const updateSupplier = async (data: UpdateSupplierRequest) => {
+  if (!data.id) {
+    throw new Error('Supplier ID is required for update')
+  }
+  
+  const payload = {
+    id: data.id,
+    name: data.name,
+    phone: data.phone,
+    email: data.email,
+    address: data.address,
+  }
+  
+  const response = await apiClient.put<ApiResponse<boolean>>(`/Supplier/updatesupplier/${data.id}`, payload)
+  return response.data
+}
+
+/**
+ * Delete a supplier
+ */
+export const deleteSupplier = async (supplierId: string) => {
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/Supplier/deletesupplier/${supplierId}`)
   return response.data
 }

@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { X, DollarSign, Tag, FileText, Package } from 'lucide-react'
+import { X, DollarSign, Tag, FileText, Package, Truck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { addExpense, updateExpense, getAllProducts } from '@/lib/api-client'
+import { addExpense, updateExpense, getAllProducts, getAllSuppliers } from '@/lib/api-client'
 import { Expense, CreateExpenseRequest, UpdateExpenseRequest } from '@/types'
 import { translateApiMessage } from '@/lib/translations'
 import toast from 'react-hot-toast'
@@ -23,6 +23,7 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
   const [category, setCategory] = useState('')
   const [amount, setAmount] = useState('')
   const [productId, setProductId] = useState<string>('')
+  const [supplierId, setSupplierId] = useState<string>('')
 
   // Fetch products for optional linking
   const { data: productsResponse } = useQuery({
@@ -32,17 +33,27 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
 
   const products = productsResponse?.data || []
 
+  // Fetch suppliers for optional linking
+  const { data: suppliersResponse } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: getAllSuppliers,
+  })
+
+  const suppliers = suppliersResponse?.data || []
+
   useEffect(() => {
     if (expense) {
       setTitle(expense.title)
       setCategory(expense.category || '')
       setAmount(expense.amount.toString())
       setProductId(expense.productId || '')
+      setSupplierId(expense.supplierId || '')
     } else {
       setTitle('')
       setCategory('')
       setAmount('')
       setProductId('')
+      setSupplierId('')
     }
   }, [expense, isOpen])
 
@@ -88,12 +99,14 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
           id: expense.id,
           title: title.trim(),
           category: category.trim() || null,
-          amount: parseFloat(amount),
-          productId: productId || null,
+          supplierId: supplierId || null,
         }
       : {
           title: title.trim(),
           category: category.trim() || null,
+          amount: parseFloat(amount),
+          productId: productId || null,
+          supplierId: supplier.trim() || null,
           amount: parseFloat(amount),
           productId: productId || null,
         }
@@ -194,6 +207,31 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
             </p>
           </div>
 
+          {/* Supplier (Optional) */}
+          <div className="space-y-2">
+            <Label htmlFor="supplier" className="flex items-center gap-2 font-semibold">
+              <Truck className="h-4 w-4 text-blue-600" />
+              المورد (اختياري)
+            </Label>
+            <select
+              id="supplier"
+              value={supplierId}
+              onChange={(e) => setSupplierId(e.target.value)}
+              className="w-full px-4 py-2.5 border border-input bg-background rounded-lg focus:ring-2 focus:ring-primary/20 transition-all"
+              disabled={mutation.isPending}
+            >
+              <option value="">بدون ربط بمورد</option>
+              {suppliers.map((supplier) => (
+                <option key={supplier.id} value={supplier.id}>
+                  {supplier.name} - {supplier.phone}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground">
+              اختر مورد إذا كان المصروف متعلق بشراء من مورد معين
+            </p>
+          </div>
+
           {/* Amount */}
           <div className="space-y-2">
             <Label htmlFor="amount" className="flex items-center gap-2 font-semibold">
@@ -203,8 +241,8 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
             <Input
               id="amount"
               type="number"
-              step="0.01"
-              min="0.01"
+              step="1"
+              min="1"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"

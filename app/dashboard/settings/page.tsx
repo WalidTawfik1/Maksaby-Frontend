@@ -71,10 +71,13 @@ export default function SettingsPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     
+    const initialCashValue = formData.get('initialCash') as string
+    
     const data: UpdateProfileFormData = {
       name: formData.get('name') as string,
       phoneNumber: formData.get('phoneNumber') as string,
       logo: selectedFile,
+      initialCash: initialCashValue ? parseFloat(initialCashValue) : undefined,
     }
     
     updateMutation.mutate(data)
@@ -181,6 +184,42 @@ export default function SettingsPage() {
                 required
                 placeholder="أدخل رقم الهاتف"
               />
+            </div>
+
+            {/* Initial Cash */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="initialCash">النقد الأولي</Label>
+                <div className="relative group">
+                  <div className="cursor-help p-1 hover:bg-muted rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  </div>
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-56 text-center z-10">
+                    المبلغ النقدي الذي بدأت به. تغييره سيؤثر على النقد الحالي
+                  </div>
+                </div>
+              </div>
+              <Input
+                id="initialCash"
+                name="initialCash"
+                type="number"
+                step="1"
+                min="0"
+                defaultValue={profile?.initialCash ?? ''}
+                placeholder="أدخل النقد الأولي"
+              />
+              <p className="text-xs text-amber-600 flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                تحذير: تغيير هذا المبلغ سيؤثر على رصيد النقد الحالي
+              </p>
             </div>
 
             {/* Submit Button */}

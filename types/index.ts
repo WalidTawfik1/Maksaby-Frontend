@@ -13,6 +13,7 @@ export interface UserProfile {
   userName: string
   phoneNumber: string
   logoUrl: string
+  initialCash: number
 }
 
 // Form data for updating profile
@@ -20,6 +21,7 @@ export interface UpdateProfileFormData {
   name: string
   phoneNumber: string
   logo?: File | null
+  initialCash?: number
 }
 
 // API Response wrapper
@@ -38,6 +40,7 @@ export interface Product {
   stock: number
   imageUrl?: string | null
   description?: string | null
+  supplierId?: string | null
 }
 
 // Form data for creating/updating products
@@ -48,6 +51,7 @@ export interface ProductFormData {
   stock: number
   imageUrl?: File | null
   description?: string
+  supplierId?: string
   id?: string // Only for update
 }
 
@@ -150,6 +154,7 @@ export interface DashboardMetrics {
   totalExpenses: number
   productCount: number
   customerCount: number
+  currentCash: number
 }
 
 export interface RecentOrder {
@@ -183,6 +188,7 @@ export interface PaginatedResponse<T> {
 export interface Expense {
   id: string
   productId?: string | null
+  supplierId?: string | null
   title: string
   category?: string | null
   amount: number
@@ -196,6 +202,7 @@ export interface ExpensesResponse {
 
 export interface CreateExpenseRequest {
   productId?: string | null
+  supplierId?: string | null
   title: string
   category?: string | null
   amount: number
@@ -204,6 +211,7 @@ export interface CreateExpenseRequest {
 export interface UpdateExpenseRequest {
   id: string
   productId?: string | null
+  supplierId?: string | null
   title?: string
   category?: string | null
   amount?: number
@@ -230,4 +238,30 @@ export interface UpdateNoteRequest {
   customerId?: string | null
   content?: string
   isCompleted?: boolean
+}
+
+// Supplier types
+export interface Supplier {
+  id: string
+  name: string
+  phone: string
+  email?: string | null
+  address?: string | null
+  totalPurchased: number
+  createdAt: string
+}
+
+export interface CreateSupplierRequest {
+  name: string
+  phone: string
+  email?: string
+  address?: string
+}
+
+export interface UpdateSupplierRequest {
+  id: string
+  name?: string
+  phone?: string
+  email?: string
+  address?: string
 }

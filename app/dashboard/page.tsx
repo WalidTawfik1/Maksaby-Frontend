@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { getDashboardData, getUserProfile } from '@/lib/api-client'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { translateApiMessage } from '@/lib/translations'
-import { LayoutDashboard, TrendingUp, Package, Users, ShoppingCart, User as UserIcon, Filter, X, Wallet, Receipt } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, Package, Users, ShoppingCart, User as UserIcon, Filter, X, Wallet, Receipt, Banknote } from 'lucide-react'
 import { FilterType } from '@/types'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
@@ -203,6 +203,39 @@ export default function DashboardPage() {
 
       {/* Metrics Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-fade-in">
+        {/* Current Cash - Prominent Display */}
+        <Card className="relative col-span-full md:col-span-2 lg:col-span-1">
+          <div className={`absolute inset-0 rounded-lg ${(stats?.currentCash ?? 0) >= 0 ? 'bg-gradient-to-br from-emerald-500/10 to-green-500/10' : 'bg-gradient-to-br from-red-500/10 to-rose-500/10'}`} />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-sm font-medium">النقد الحالي</CardTitle>
+              <div className="relative group">
+                <div className="cursor-help p-1 hover:bg-muted rounded-full transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                </div>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-48 text-center z-50 whitespace-nowrap">
+                  النقد الأولي + المبيعات - المصروفات
+                </div>
+              </div>
+            </div>
+            <div className={`p-2 ${(stats?.currentCash ?? 0) >= 0 ? 'bg-emerald-500/10' : 'bg-red-500/10'} rounded-lg`}>
+              <Banknote className={`h-5 w-5 ${(stats?.currentCash ?? 0) >= 0 ? 'text-emerald-600' : 'text-red-600'}`} />
+            </div>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className={`text-3xl font-bold ${(stats?.currentCash ?? 0) >= 0 ? 'bg-gradient-to-r from-emerald-600 to-green-600' : 'bg-gradient-to-r from-red-600 to-rose-600'} bg-clip-text text-transparent`}>
+              {formatCurrency(stats?.currentCash || 0)}
+            </div>
+            {(stats?.currentCash ?? 0) < 0 && (
+              <p className="text-xs text-red-600 mt-2">تحذير: الرصيد سالب</p>
+            )}
+          </CardContent>
+        </Card>
+
         <Card className="overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">

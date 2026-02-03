@@ -26,7 +26,7 @@ interface OrderItemForm extends CreateOrderItem {
 export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
   const queryClient = useQueryClient()
   const [customerId, setCustomerId] = useState<string>('')
-  const [discount, setDiscount] = useState<number>(0)
+  const [discount, setDiscount] = useState<number | ''>('')
   const [notes, setNotes] = useState<string>('')
   const [orderItems, setOrderItems] = useState<OrderItemForm[]>([])
   const [selectedProductId, setSelectedProductId] = useState<string>('')
@@ -387,7 +387,7 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
                 <Input
                   id="customPrice"
                   type="number"
-                  step="0.01"
+                  step="1"
                   min="0"
                   value={customPrice}
                   onChange={(e) => setCustomPrice(e.target.value)}
@@ -490,9 +490,9 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
                 type="number"
                 min="0"
                 max="100"
-                step="0.01"
+                step="1"
                 value={discount}
-                onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                onChange={(e) => setDiscount(e.target.value === '' ? '' : parseFloat(e.target.value) || '')}
                 disabled={mutation.isPending}
                 className="border-orange-300 focus:ring-orange-500/20 text-lg font-bold"
                 placeholder="0"

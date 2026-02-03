@@ -15,6 +15,7 @@ import {
   LogOut,
   Settings,
   User as UserIcon,
+  Truck,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -42,6 +43,11 @@ const navigationItems = [
     title: 'العملاء',
     href: '/dashboard/customers',
     icon: Users,
+  },
+  {
+    title: 'الموردين',
+    href: '/dashboard/suppliers',
+    icon: Truck,
   },
   {
     title: 'المصروفات',

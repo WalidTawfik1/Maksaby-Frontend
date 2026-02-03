@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { X, Upload, Loader2 } from 'lucide-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { X, Upload, Loader2, Truck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { addProduct, updateProduct } from '@/lib/api-client'
+import { addProduct, updateProduct, getAllSuppliers } from '@/lib/api-client'
 import { Product, ProductFormData } from '@/types'
 import toast from 'react-hot-toast'
 
@@ -20,13 +20,22 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
   const queryClient = useQueryClient()
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
-    buyingPrice: 0,
-    sellingPrice: 0,
-    stock: 0,
+    buyingPrice: '' as any,
+    sellingPrice: '' as any,
+    stock: '' as any,
     description: '',
     imageUrl: null,
+    supplierId: '',
   })
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  // Fetch suppliers for optional linking
+  const { data: suppliersResponse } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: getAllSuppliers,
+  })
+
+  const suppliers = suppliersResponse?.data || []
 
   // Update form when product changes
   useEffect(() => {
@@ -39,16 +48,18 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
         stock: product.stock,
         description: product.description || '',
         imageUrl: null,
+        supplierId: product.supplierId || '',
       })
       setImagePreview(product.imageUrl || null)
     } else {
       setFormData({
         name: '',
-        buyingPrice: 0,
-        sellingPrice: 0,
-        stock: 0,
+        buyingPrice: '' as any,
+        sellingPrice: '' as any,
+        stock: '' as any,
         description: '',
         imageUrl: null,
+        supplierId: '',
       })
       setImagePreview(null)
     }
@@ -150,9 +161,9 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
             <Input
               id="buyingPrice"
               type="number"
-              step="0.01"
+              step="1"
               value={formData.buyingPrice}
-              onChange={(e) => setFormData({ ...formData, buyingPrice: parseFloat(e.target.value) || 0 })}
+              onChange={(e) => setFormData({ ...formData, buyingPrice: e.target.value === '' ? '' as any : parseFloat(e.target.value) || '' as any })}
               placeholder="0.00"
               required
               disabled={mutation.isPending}
@@ -165,9 +176,9 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
             <Input
               id="sellingPrice"
               type="number"
-              step="0.01"
+              step="1"
               value={formData.sellingPrice}
-              onChange={(e) => setFormData({ ...formData, sellingPrice: parseFloat(e.target.value) || 0 })}
+              onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value === '' ? '' as any : parseFloat(e.target.value) || '' as any })}
               placeholder="0.00"
               required
               disabled={mutation.isPending}
@@ -181,7 +192,7 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
               id="stock"
               type="number"
               value={formData.stock}
-              onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })}
+              onChange={(e) => setFormData({ ...formData, stock: e.target.value === '' ? '' as any : parseInt(e.target.value) || '' as any })}
               placeholder="0"
               required
               disabled={mutation.isPending}
@@ -199,6 +210,28 @@ export function ProductFormDialog({ product, isOpen, onClose }: ProductFormDialo
               className="w-full min-h-[80px] px-3 py-2 border border-input bg-background rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               disabled={mutation.isPending}
             />
+          </div>
+
+          {/* Supplier */}
+          <div className="space-y-2">
+            <Label htmlFor="supplier" className="flex items-center gap-2">
+              <Truck className="h-4 w-4 text-blue-600" />
+              المورد (اختياري)
+            </Label>
+            <select
+              id="supplier"
+              value={formData.supplierId}
+              onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
+              className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              disabled={mutation.isPending}
+            >
+              <option value="">بدون مورد</option>
+              {suppliers.map((supplier) => (
+                <option key={supplier.id} value={supplier.id}>
+                  {supplier.name} - {supplier.phone}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Image Upload */}
