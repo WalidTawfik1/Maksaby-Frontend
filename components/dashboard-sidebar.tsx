@@ -71,7 +71,12 @@ const navigationItems = [
   },
 ]
 
-export function DashboardSidebar() {
+interface DashboardSidebarProps {
+  isOpen?: boolean
+  onClose?: () => void
+}
+
+export function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarProps) {
   const pathname = usePathname()
   const { logout, getCurrentUser } = useAuth()
   const user = getCurrentUser()
@@ -85,7 +90,11 @@ export function DashboardSidebar() {
   const profile = profileResponse?.data
 
   return (
-    <div className="flex h-full w-64 flex-col bg-card/80 backdrop-blur-xl border-l border-border/50 shadow-2xl">
+    <div className={cn(
+      "flex h-full w-64 flex-col bg-card/80 backdrop-blur-xl border-l border-border/50 shadow-2xl",
+      "fixed lg:relative inset-y-0 right-0 z-40 transition-transform duration-300 ease-in-out",
+      isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
+    )}>
       {/* User Profile Logo */}
       <div className="flex h-20 items-center justify-between border-b border-border/50 px-4 bg-gradient-to-b from-primary/5 to-transparent">
         <div className="relative h-14 w-14 rounded-full overflow-hidden border-2 border-primary/30 shadow-lg">
@@ -115,6 +124,7 @@ export function DashboardSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => onClose?.()}
               className={cn(
                 'group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 relative overflow-hidden',
                 isActive
