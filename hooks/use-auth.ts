@@ -33,7 +33,7 @@ export function useAuth() {
 
   const login = useMutation({
     mutationFn: async (data: LoginData) => {
-      const response = await apiClient.post<ApiResponse<User>>('/Auth/login', data)
+      const response = await apiClient.post<ApiResponse<User>>('/v1/Auth/login', data)
       return response.data
     },
     onSuccess: (response) => {
@@ -69,7 +69,7 @@ export function useAuth() {
 
   const register = useMutation({
     mutationFn: async (data: RegisterData) => {
-      const response = await apiClient.post<ApiResponse<User>>('/Auth/register', data)
+      const response = await apiClient.post<ApiResponse<User>>('/v1/Auth/register', data)
       return response.data
     },
     onSuccess: (response) => {
@@ -103,7 +103,7 @@ export function useAuth() {
 
   const forgotPassword = useMutation({
     mutationFn: async (data: ForgotPasswordData) => {
-      const response = await apiClient.post<ApiResponse<null>>('/Auth/forgot-password', data)
+      const response = await apiClient.post<ApiResponse<null>>('/v1/Auth/forgot-password', data)
       return response.data
     },
     onSuccess: (response) => {
@@ -134,7 +134,7 @@ export function useAuth() {
 
   const resetPassword = useMutation({
     mutationFn: async (data: ResetPasswordData) => {
-      const response = await apiClient.post<ApiResponse<null>>('/Auth/reset-password', data)
+      const response = await apiClient.post<ApiResponse<null>>('/v1/Auth/reset-password', data)
       return response.data
     },
     onSuccess: (response) => {
@@ -168,7 +168,7 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await apiClient.post<ApiResponse<null>>('/Auth/logout')
+      await apiClient.post<ApiResponse<null>>('/v1/Auth/logout')
       Cookies.remove('token')
       Cookies.remove('user')
       toast.success('تم تسجيل الخروج بنجاح')

@@ -57,7 +57,7 @@ interface GetAllProductsParams {
 export const getAllProducts = async (params: GetAllProductsParams = {}) => {
   const { pageNum = 1, pageSize = 50, searchTerm = '' } = params
   
-  const response = await apiClient.get<ApiResponse<ProductListResponse>>('/Product/getallproducts', {
+  const response = await apiClient.get<ApiResponse<ProductListResponse>>('/v1/Product/getallproducts', {
     params: {
       pagenum: pageNum,
       pagesize: pageSize,
@@ -72,7 +72,7 @@ export const getAllProducts = async (params: GetAllProductsParams = {}) => {
  * Get all products without pagination
  */
 export const getAllProductsWithoutPagination = async () => {
-  const response = await apiClient.get<ApiResponse<Product[]>>('/Product/getallproductswithoutpagination')
+  const response = await apiClient.get<ApiResponse<Product[]>>('/v1/Product/getallproductswithoutpagination')
   return response.data
 }
 
@@ -80,7 +80,7 @@ export const getAllProductsWithoutPagination = async () => {
  * Get a single product by ID
  */
 export const getProductById = async (productId: string) => {
-  const response = await apiClient.get<ApiResponse<Product>>(`/Product/${productId}`)
+  const response = await apiClient.get<ApiResponse<Product>>(`/v1/Product/${productId}`)
   return response.data
 }
 
@@ -106,7 +106,7 @@ export const addProduct = async (data: ProductFormData) => {
     formData.append('SupplierId', data.supplierId)
   }
   
-  const response = await apiClient.post<ApiResponse<Product>>('/Product/addproduct', formData, {
+  const response = await apiClient.post<ApiResponse<Product>>('/v1/Product/addproduct', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -142,7 +142,7 @@ export const updateProduct = async (data: ProductFormData) => {
     formData.append('SupplierId', data.supplierId)
   }
   
-  const response = await apiClient.patch<ApiResponse<boolean>>('/Product/updateproduct', formData, {
+  const response = await apiClient.patch<ApiResponse<boolean>>('/v1/Product/updateproduct', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -155,7 +155,7 @@ export const updateProduct = async (data: ProductFormData) => {
  * Delete a product
  */
 export const deleteProduct = async (productId: string) => {
-  const response = await apiClient.delete<ApiResponse<boolean>>(`/Product/${productId}`)
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/v1/Product/${productId}`)
   return response.data
 }
 
@@ -175,7 +175,7 @@ interface GetAllCustomersParams {
 export const getAllCustomers = async (params: GetAllCustomersParams = {}) => {
   const { pageNum = 1, pageSize = 50, searchTerm = '' } = params
   
-  const response = await apiClient.get<ApiResponse<CustomerListResponse>>('/Customer/getallcustomers', {
+  const response = await apiClient.get<ApiResponse<CustomerListResponse>>('/v1/Customer/getallcustomers', {
     params: {
       pagenum: pageNum,
       pagesize: pageSize,
@@ -190,7 +190,7 @@ export const getAllCustomers = async (params: GetAllCustomersParams = {}) => {
  * Get a single customer by ID
  */
 export const getCustomerById = async (customerId: string) => {
-  const response = await apiClient.get<ApiResponse<Customer>>(`/Customer/${customerId}`)
+  const response = await apiClient.get<ApiResponse<Customer>>(`/v1/Customer/${customerId}`)
   return response.data
 }
 
@@ -205,7 +205,7 @@ export const addCustomer = async (data: CustomerFormData) => {
     address: data.address,
   }
   
-  const response = await apiClient.post<ApiResponse<Customer>>('/Customer/addcustomer', payload)
+  const response = await apiClient.post<ApiResponse<Customer>>('/v1/Customer/addcustomer', payload)
   return response.data
 }
 
@@ -225,7 +225,7 @@ export const updateCustomer = async (data: CustomerFormData) => {
     address: data.address,
   }
   
-  const response = await apiClient.patch<ApiResponse<boolean>>('/Customer/updatecustomer', payload)
+  const response = await apiClient.patch<ApiResponse<boolean>>('/v1/Customer/updatecustomer', payload)
   return response.data
 }
 
@@ -233,7 +233,7 @@ export const updateCustomer = async (data: CustomerFormData) => {
  * Delete a customer
  */
 export const deleteCustomer = async (customerId: string) => {
-  const response = await apiClient.delete<ApiResponse<boolean>>(`/Customer/${customerId}`)
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/v1/Customer/${customerId}`)
   return response.data
 }
 
@@ -263,7 +263,7 @@ export const getAllStockMovements = async (params: GetAllStockMovementsParams = 
     FilterType = null, // null means get all
   } = params
 
-  const response = await apiClient.get<ApiResponse<StockMovementListResponse>>('/StockMovement/getallstockmovements', {
+  const response = await apiClient.get<ApiResponse<StockMovementListResponse>>('/v1/StockMovement/getallstockmovements', {
     params: {
       pagenum,
       pagesize,
@@ -300,7 +300,7 @@ export const createOrder = async (data: CreateOrderRequest) => {
     orderItems: data.orderItems,
   }
   
-  const response = await apiClient.post<ApiResponse<Order>>('/Order/createorder', payload)
+  const response = await apiClient.post<ApiResponse<Order>>('/v1/Order/createorder', payload)
   return response.data
 }
 
@@ -316,7 +316,7 @@ export const getAllOrders = async (params: GetAllOrdersParams = {}) => {
     endDate = null,
   } = params
   
-  const response = await apiClient.get<ApiResponse<OrderListResponse>>('/Order/getallorders', {
+  const response = await apiClient.get<ApiResponse<OrderListResponse>>('/v1/Order/getallorders', {
     params: {
       pagenum: pageNum,
       pagesize: pageSize,
@@ -333,7 +333,7 @@ export const getAllOrders = async (params: GetAllOrdersParams = {}) => {
  * Get a single order by ID
  */
 export const getOrderById = async (orderId: string) => {
-  const response = await apiClient.get<ApiResponse<Order>>(`/Order/${orderId}`)
+  const response = await apiClient.get<ApiResponse<Order>>(`/v1/Order/${orderId}`)
   return response.data
 }
 
@@ -346,7 +346,7 @@ export const getOrdersByCustomerId = async (
   pageSize: number = 10
 ) => {
   const response = await apiClient.get<ApiResponse<OrderListResponse>>(
-    `/Order/getorderbycustomerid/${customerId}`,
+    `/v1/Order/getorderbycustomerid/${customerId}`,
     {
       params: {
         pagenum: pageNum,
@@ -362,7 +362,7 @@ export const getOrdersByCustomerId = async (
  * Delete an order (soft delete)
  */
 export const deleteOrder = async (orderId: string) => {
-  const response = await apiClient.delete<ApiResponse<string>>(`/Order/${orderId}`)
+  const response = await apiClient.delete<ApiResponse<string>>(`/v1/Order/${orderId}`)
   return response.data
 }
 
@@ -386,7 +386,7 @@ export const getDashboardData = async (params: GetDashboardDataParams = {}) => {
     filterType = null,
   } = params
 
-  const response = await apiClient.get<ApiResponse<DashboardData>>('/Dashboard', {
+  const response = await apiClient.get<ApiResponse<DashboardData>>('/v1/Dashboard', {
     params: {
       StartDate: startDate,
       EndDate: endDate,
@@ -412,7 +412,7 @@ interface GetAllExpensesParams {
  * Add a new expense
  */
 export const addExpense = async (data: CreateExpenseRequest) => {
-  const response = await apiClient.post<ApiResponse<Expense>>('/Expense/addexpense', data)
+  const response = await apiClient.post<ApiResponse<Expense>>('/v1/Expense/addexpense', data)
   return response.data
 }
 
@@ -434,7 +434,7 @@ export const getAllExpenses = async (params: GetAllExpensesParams = {}) => {
     if (params.endDate) queryParams.EndDate = params.endDate
   }
 
-  const response = await apiClient.get<ApiResponse<ExpensesResponse>>('/Expense/getallexpenses', {
+  const response = await apiClient.get<ApiResponse<ExpensesResponse>>('/v1/Expense/getallexpenses', {
     params: queryParams,
   })
   return response.data
@@ -444,7 +444,7 @@ export const getAllExpenses = async (params: GetAllExpensesParams = {}) => {
  * Get expense by ID
  */
 export const getExpenseById = async (expenseId: string) => {
-  const response = await apiClient.get<ApiResponse<Expense>>(`/Expense/${expenseId}`)
+  const response = await apiClient.get<ApiResponse<Expense>>(`/v1/Expense/${expenseId}`)
   return response.data
 }
 
@@ -452,7 +452,7 @@ export const getExpenseById = async (expenseId: string) => {
  * Update an existing expense
  */
 export const updateExpense = async (data: UpdateExpenseRequest) => {
-  const response = await apiClient.patch<ApiResponse<boolean>>('/Expense/updateexpense', data)
+  const response = await apiClient.patch<ApiResponse<boolean>>('/v1/Expense/updateexpense', data)
   return response.data
 }
 
@@ -460,7 +460,7 @@ export const updateExpense = async (data: UpdateExpenseRequest) => {
  * Delete an expense
  */
 export const deleteExpense = async (expenseId: string) => {
-  const response = await apiClient.delete<ApiResponse<boolean>>(`/Expense/${expenseId}`)
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/v1/Expense/${expenseId}`)
   return response.data
 }
 
@@ -473,7 +473,7 @@ export const getExpensesBySupplier = async (
   pageSize: number = 10
 ) => {
   const response = await apiClient.get<ApiResponse<ExpensesResponse>>(
-    `/Expense/getallexpensesbysupplier`,
+    `/v1/Expense/getallexpensesbysupplier`,
     {
       params: {
         supplierId,
@@ -501,7 +501,7 @@ interface GetAllNotesParams {
  * Add a new note
  */
 export const addNote = async (data: CreateNoteRequest) => {
-  const response = await apiClient.post<ApiResponse<Note>>('/Note/addnote', data)
+  const response = await apiClient.post<ApiResponse<Note>>('/v1/Note/addnote', data)
   return response.data
 }
 
@@ -519,7 +519,7 @@ export const getAllNotes = async (params: GetAllNotesParams = {}) => {
     queryParams.isCompleted = params.isCompleted
   }
 
-  const response = await apiClient.get<ApiResponse<NoteListResponse>>('/Note/getallnotes', {
+  const response = await apiClient.get<ApiResponse<NoteListResponse>>('/v1/Note/getallnotes', {
     params: queryParams,
   })
   return response.data
@@ -529,7 +529,7 @@ export const getAllNotes = async (params: GetAllNotesParams = {}) => {
  * Get note by ID
  */
 export const getNoteById = async (noteId: string) => {
-  const response = await apiClient.get<ApiResponse<Note>>(`/Note/${noteId}`)
+  const response = await apiClient.get<ApiResponse<Note>>(`/v1/Note/${noteId}`)
   return response.data
 }
 
@@ -537,7 +537,7 @@ export const getNoteById = async (noteId: string) => {
  * Get notes by customer ID
  */
 export const getNotesByCustomerId = async (customerId: string) => {
-  const response = await apiClient.get<ApiResponse<Note[]>>(`/Note/customer/${customerId}`)
+  const response = await apiClient.get<ApiResponse<Note[]>>(`/v1/Note/customer/${customerId}`)
   return response.data
 }
 
@@ -545,7 +545,7 @@ export const getNotesByCustomerId = async (customerId: string) => {
  * Update an existing note
  */
 export const updateNote = async (data: UpdateNoteRequest) => {
-  const response = await apiClient.patch<ApiResponse<boolean>>('/Note/updatenote', data)
+  const response = await apiClient.patch<ApiResponse<boolean>>('/v1/Note/updatenote', data)
   return response.data
 }
 
@@ -553,7 +553,7 @@ export const updateNote = async (data: UpdateNoteRequest) => {
  * Toggle note completion status
  */
 export const toggleNoteCompletion = async (noteId: string) => {
-  const response = await apiClient.patch<ApiResponse<Note>>(`/Note/${noteId}/toggle`)
+  const response = await apiClient.patch<ApiResponse<Note>>(`/v1/Note/${noteId}/toggle`)
   return response.data
 }
 
@@ -561,7 +561,7 @@ export const toggleNoteCompletion = async (noteId: string) => {
  * Delete a note
  */
 export const deleteNote = async (noteId: string) => {
-  const response = await apiClient.delete<ApiResponse<boolean>>(`/Note/${noteId}`)
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/v1/Note/${noteId}`)
   return response.data
 }
 
@@ -573,7 +573,7 @@ export const deleteNote = async (noteId: string) => {
  * Get user profile
  */
 export const getUserProfile = async () => {
-  const response = await apiClient.get<ApiResponse<UserProfile>>('/User/profile')
+  const response = await apiClient.get<ApiResponse<UserProfile>>('/v1/User/profile')
   return response.data
 }
 
@@ -593,7 +593,7 @@ export const updateUserProfile = async (data: UpdateProfileFormData) => {
     formData.append('InitialCash', data.initialCash.toString())
   }
   
-  const response = await apiClient.patch<ApiResponse<boolean>>('/User/updateprofile', formData, {
+  const response = await apiClient.patch<ApiResponse<boolean>>('/v1/User/updateprofile', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -619,7 +619,7 @@ export interface RequestDemoResponse {
  * Request a demo account
  */
 export const requestDemo = async (email: string) => {
-  const response = await apiClient.post<ApiResponse<RequestDemoResponse>>('/Auth/request-demo', { email })
+  const response = await apiClient.post<ApiResponse<RequestDemoResponse>>('/v1/Auth/request-demo', { email })
   return response.data
 }
 
@@ -631,7 +631,7 @@ export const requestDemo = async (email: string) => {
  * Get all suppliers
  */
 export const getAllSuppliers = async () => {
-  const response = await apiClient.get<ApiResponse<Supplier[]>>('/Supplier/getallsuppliers')
+  const response = await apiClient.get<ApiResponse<Supplier[]>>('/v1/Supplier/getallsuppliers')
   return response.data
 }
 
@@ -639,7 +639,7 @@ export const getAllSuppliers = async () => {
  * Get a single supplier by ID
  */
 export const getSupplierById = async (supplierId: string) => {
-  const response = await apiClient.get<ApiResponse<Supplier>>(`/Supplier/getsupplierbyid/${supplierId}`)
+  const response = await apiClient.get<ApiResponse<Supplier>>(`/v1/Supplier/getsupplierbyid/${supplierId}`)
   return response.data
 }
 
@@ -654,7 +654,7 @@ export const addSupplier = async (data: CreateSupplierRequest) => {
     address: data.address || undefined,
   }
   
-  const response = await apiClient.post<ApiResponse<Supplier>>('/Supplier/addsupplier', payload)
+  const response = await apiClient.post<ApiResponse<Supplier>>('/v1/Supplier/addsupplier', payload)
   return response.data
 }
 
@@ -674,7 +674,7 @@ export const updateSupplier = async (data: UpdateSupplierRequest) => {
     address: data.address,
   }
   
-  const response = await apiClient.put<ApiResponse<boolean>>(`/Supplier/updatesupplier/${data.id}`, payload)
+  const response = await apiClient.put<ApiResponse<boolean>>(`/v1/Supplier/updatesupplier/${data.id}`, payload)
   return response.data
 }
 
@@ -682,7 +682,7 @@ export const updateSupplier = async (data: UpdateSupplierRequest) => {
  * Delete a supplier
  */
 export const deleteSupplier = async (supplierId: string) => {
-  const response = await apiClient.delete<ApiResponse<boolean>>(`/Supplier/deletesupplier/${supplierId}`)
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/v1/Supplier/deletesupplier/${supplierId}`)
   return response.data
 }
 
@@ -700,7 +700,7 @@ interface GetAllFixedAssetsParams {
  * Create a new fixed asset
  */
 export const addFixedAsset = async (data: CreateFixedAssetRequest) => {
-  const response = await apiClient.post<ApiResponse<FixedAsset>>('/FixedAsset/addfixedasset', data)
+  const response = await apiClient.post<ApiResponse<FixedAsset>>('/v1/FixedAsset/addfixedasset', data)
   return response.data
 }
 
@@ -710,7 +710,7 @@ export const addFixedAsset = async (data: CreateFixedAssetRequest) => {
 export const getAllFixedAssets = async (params: GetAllFixedAssetsParams = {}) => {
   const { pageNum = 1, pageSize = 10, searchTerm = '' } = params
   
-  const response = await apiClient.get<ApiResponse<FixedAssetListResponse>>('/FixedAsset/getallfixedassets', {
+  const response = await apiClient.get<ApiResponse<FixedAssetListResponse>>('/v1/FixedAsset/getallfixedassets', {
     params: {
       pagenum: pageNum,
       pagesize: pageSize,
@@ -725,7 +725,7 @@ export const getAllFixedAssets = async (params: GetAllFixedAssetsParams = {}) =>
  * Get a single fixed asset by ID
  */
 export const getFixedAssetById = async (fixedAssetId: string) => {
-  const response = await apiClient.get<ApiResponse<FixedAsset>>(`/FixedAsset/${fixedAssetId}`)
+  const response = await apiClient.get<ApiResponse<FixedAsset>>(`/v1/FixedAsset/${fixedAssetId}`)
   return response.data
 }
 
@@ -733,7 +733,7 @@ export const getFixedAssetById = async (fixedAssetId: string) => {
  * Update an existing fixed asset
  */
 export const updateFixedAsset = async (data: UpdateFixedAssetRequest) => {
-  const response = await apiClient.patch<ApiResponse<boolean>>('/FixedAsset/updatefixedasset', data)
+  const response = await apiClient.patch<ApiResponse<boolean>>('/v1/FixedAsset/updatefixedasset', data)
   return response.data
 }
 
@@ -741,6 +741,6 @@ export const updateFixedAsset = async (data: UpdateFixedAssetRequest) => {
  * Delete a fixed asset
  */
 export const deleteFixedAsset = async (fixedAssetId: string) => {
-  const response = await apiClient.delete<ApiResponse<boolean>>(`/FixedAsset/${fixedAssetId}`)
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/v1/FixedAsset/${fixedAssetId}`)
   return response.data
 }
