@@ -375,7 +375,7 @@ export default function StockPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>حركة المخزون</CardTitle>
+            <CardTitle>حركة المخزون ({getFilterTypeLabel(filterType)})</CardTitle>
             <div className="flex gap-2">
               <div className="flex gap-1 border rounded-md p-1">
                 <Button

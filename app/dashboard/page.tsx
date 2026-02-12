@@ -65,6 +65,15 @@ export default function DashboardPage() {
   const stats = dashboardData?.stats
   const recentOrders = dashboardData?.recentOrders || []
 
+  const getFilterTypeLabel = (type: FilterType | null) => {
+    if (type === null) return 'الكل'
+    if (type === FilterType.Today) return 'اليوم'
+    if (type === FilterType.ThisWeek) return 'هذا الأسبوع'
+    if (type === FilterType.ThisMonth) return 'هذا الشهر'
+    if (type === FilterType.Custom) return 'مخصص'
+    return 'الكل'
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
@@ -87,7 +96,7 @@ export default function DashboardPage() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
             مرحباً، {profile?.name || 'المستخدم'} 👋
           </h1>
-          <p className="text-muted-foreground text-lg">نظرة عامة على أعمالك اليوم</p>
+          <p className="text-black dark:text-white text-lg font-semibold">نظرة عامة على أعمالك ({getFilterTypeLabel(filterType)})</p>
         </div>
         <Button
           variant="outline"
