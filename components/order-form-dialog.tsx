@@ -52,7 +52,7 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
     queryFn: () => getAllProductsWithoutPagination(),
   })
 
-  const customers = customersResponse?.data || []
+  const customers = customersResponse?.data?.customers || []
   const products = productsResponse?.data || []
 
   // Filter customers based on search

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Search, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +18,7 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
+  const [pageInput, setPageInput] = useState('1')
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -36,7 +37,9 @@ export default function ProductsPage() {
     },
   })
 
-  const products = response?.data || []
+  const products = response?.data?.products || []
+  const totalPages = response?.data?.totalPages || 1
+  const totalCount = response?.data?.totalCount || 0
 
   const handleSearch = () => {
     setSearchQuery(searchInput)
@@ -141,7 +144,7 @@ export default function ProductsPage() {
           />
         </div>
         <div className="text-sm text-muted-foreground">
-          عدد المنتجات: <span className="font-semibold text-foreground">{products.length}</span>
+          عدد المنتجات: <span className="font-semibold text-foreground">{totalCount}</span>
         </div>
       </div>
 
@@ -239,28 +242,82 @@ export default function ProductsPage() {
 
       {/* Pagination */}
       {products.length > 0 && (
-        <div className="flex items-center justify-between pt-4">
-          <div className="text-sm text-muted-foreground">
-            الصفحة {currentPage}
-          </div>
-          <div className="flex gap-2">
+        <div className="flex items-center justify-center pt-4">
+          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => {
+                setCurrentPage(1)
+                setPageInput('1')
+              }}
               disabled={currentPage === 1}
+              className="h-8 w-8 p-0"
             >
-              <ChevronRight className="h-4 w-4" />
-              السابق
+              <ChevronsRight className="h-4 w-4" />
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => setCurrentPage(p => p + 1)}
-              disabled={products.length < pageSize}
+              onClick={() => {
+                const newPage = Math.max(1, currentPage - 1)
+                setCurrentPage(newPage)
+                setPageInput(newPage.toString())
+              }}
+              disabled={currentPage === 1}
+              className="h-8 px-3"
+            >
+              <ChevronRight className="h-4 w-4 ml-1" />
+              السابق
+            </Button>
+            <div className="flex items-center gap-2 px-2">
+              <span className="text-sm text-muted-foreground">صفحة</span>
+              <Input
+                type="number"
+                min="1"
+                max={totalPages}
+                value={pageInput}
+                onChange={(e) => setPageInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const page = parseInt(pageInput)
+                    if (page >= 1 && page <= totalPages) {
+                      setCurrentPage(page)
+                    } else {
+                      setPageInput(currentPage.toString())
+                    }
+                  }
+                }}
+                onBlur={() => setPageInput(currentPage.toString())}
+                className="w-20 h-8 text-center"
+              />
+              <span className="text-sm text-muted-foreground">من {totalPages}</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const newPage = Math.min(totalPages, currentPage + 1)
+                setCurrentPage(newPage)
+                setPageInput(newPage.toString())
+              }}
+              disabled={currentPage >= totalPages}
+              className="h-8 px-3"
             >
               التالي
               <ChevronLeft className="h-4 w-4 mr-1" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setCurrentPage(totalPages)
+                setPageInput(totalPages.toString())
+              }}
+              disabled={currentPage === totalPages}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronsLeft className="h-4 w-4" />
             </Button>
           </div>
         </div>

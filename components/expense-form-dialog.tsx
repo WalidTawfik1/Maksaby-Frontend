@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { X, DollarSign, Tag, FileText, Package, Truck } from 'lucide-react'
+import { X, DollarSign, Tag, FileText, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { addExpense, updateExpense, getAllProducts, getAllSuppliers } from '@/lib/api-client'
+import { addExpense, updateExpense, getAllFixedAssets } from '@/lib/api-client'
 import { Expense, CreateExpenseRequest, UpdateExpenseRequest } from '@/types'
 import { translateApiMessage } from '@/lib/translations'
 import toast from 'react-hot-toast'
@@ -22,38 +22,27 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('')
   const [amount, setAmount] = useState('')
-  const [productId, setProductId] = useState<string>('')
-  const [supplierId, setSupplierId] = useState<string>('')
+  const [fixedAssetId, setFixedAssetId] = useState<string>('')
 
-  // Fetch products for optional linking
-  const { data: productsResponse } = useQuery({
-    queryKey: ['products'],
-    queryFn: () => getAllProducts({ pageSize: 100 }),
+  // Fetch fixed assets for optional linking
+  const { data: assetsResponse } = useQuery({
+    queryKey: ['fixed-assets'],
+    queryFn: () => getAllFixedAssets({ pageSize: 100 }),
   })
 
-  const products = productsResponse?.data || []
-
-  // Fetch suppliers for optional linking
-  const { data: suppliersResponse } = useQuery({
-    queryKey: ['suppliers'],
-    queryFn: getAllSuppliers,
-  })
-
-  const suppliers = suppliersResponse?.data || []
+  const fixedAssets = assetsResponse?.data?.fixedAssets || []
 
   useEffect(() => {
     if (expense) {
       setTitle(expense.title)
       setCategory(expense.category || '')
       setAmount(expense.amount.toString())
-      setProductId(expense.productId || '')
-      setSupplierId(expense.supplierId || '')
+      setFixedAssetId(expense.fixedAssetId || '')
     } else {
       setTitle('')
       setCategory('')
       setAmount('')
-      setProductId('')
-      setSupplierId('')
+      setFixedAssetId('')
     }
   }, [expense, isOpen])
 
@@ -100,15 +89,13 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
           title: title.trim(),
           category: category.trim() || null,
           amount: parseFloat(amount),
-          productId: productId || null,
-          supplierId: supplierId || null,
+          fixedAssetId: fixedAssetId || null,
         }
       : {
           title: title.trim(),
           category: category.trim() || null,
           amount: parseFloat(amount),
-          productId: productId || null,
-          supplierId: supplierId || null,
+          fixedAssetId: fixedAssetId || null,
         }
 
     mutation.mutate(data)
@@ -130,7 +117,7 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
                 {expense ? 'تعديل مصروف' : 'إضافة مصروف جديد'}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {expense ? 'قم بتعديل بيانات المصروف' : 'سجل مصروفات العمل والتشغيل'}
+                {expense ? 'قم بتعديل بيانات المصروف' : 'سجل مصروفات التشغيل والأصول الثابتة'}
               </p>
             </div>
           </div>
@@ -176,59 +163,34 @@ export function ExpenseFormDialog({ expense, isOpen, onClose }: ExpenseFormDialo
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="مثال: تشغيلي، شراء مخزون، مرافق"
+              placeholder="مثال: تشغيلي، مرافق، أصول ثابتة"
               maxLength={100}
               disabled={mutation.isPending}
             />
           </div>
 
-          {/* Product (Optional) */}
+          {/* Fixed Asset (Optional) */}
           <div className="space-y-2">
-            <Label htmlFor="product" className="flex items-center gap-2 font-semibold">
-              <Package className="h-4 w-4 text-green-600" />
-              ربط بمنتج (اختياري)
+            <Label htmlFor="fixedAsset" className="flex items-center gap-2 font-semibold">
+              <Building2 className="h-4 w-4 text-blue-600" />
+              ربط بأصل ثابت (اختياري)
             </Label>
             <select
-              id="product"
-              value={productId}
-              onChange={(e) => setProductId(e.target.value)}
+              id="fixedAsset"
+              value={fixedAssetId}
+              onChange={(e) => setFixedAssetId(e.target.value)}
               className="w-full px-4 py-2.5 border border-input bg-background rounded-lg focus:ring-2 focus:ring-primary/20 transition-all"
               disabled={mutation.isPending}
             >
-              <option value="">بدون ربط بمنتج</option>
-              {products.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
+              <option value="">بدون ربط بأصل ثابت</option>
+              {fixedAssets.map((asset) => (
+                <option key={asset.id} value={asset.id}>
+                  {asset.name} ({asset.category || 'غير مصنف'})
                 </option>
               ))}
             </select>
             <p className="text-xs text-muted-foreground">
-              اختر منتج إذا كان المصروف متعلق بشراء مخزون معين
-            </p>
-          </div>
-
-          {/* Supplier (Optional) */}
-          <div className="space-y-2">
-            <Label htmlFor="supplier" className="flex items-center gap-2 font-semibold">
-              <Truck className="h-4 w-4 text-blue-600" />
-              المورد (اختياري)
-            </Label>
-            <select
-              id="supplier"
-              value={supplierId}
-              onChange={(e) => setSupplierId(e.target.value)}
-              className="w-full px-4 py-2.5 border border-input bg-background rounded-lg focus:ring-2 focus:ring-primary/20 transition-all"
-              disabled={mutation.isPending}
-            >
-              <option value="">بدون ربط بمورد</option>
-              {suppliers.map((supplier) => (
-                <option key={supplier.id} value={supplier.id}>
-                  {supplier.name} - {supplier.phone}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-muted-foreground">
-              اختر مورد إذا كان المصروف متعلق بشراء من مورد معين
+              اختر أصل ثابت إذا كان المصروف متعلق بشراء أصل ثابت
             </p>
           </div>
 

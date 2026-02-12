@@ -16,6 +16,7 @@ import {
   Settings,
   User as UserIcon,
   Truck,
+  Building2,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -53,6 +54,11 @@ const navigationItems = [
     title: 'المصروفات',
     href: '/dashboard/expenses',
     icon: Wallet,
+  },
+  {
+    title: 'الأصول الثابتة',
+    href: '/dashboard/assets',
+    icon: Building2,
   },
   {
     title: 'المخزون',

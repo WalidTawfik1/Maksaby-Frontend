@@ -127,12 +127,16 @@ export interface CreateOrderRequest {
   orderItems: CreateOrderItem[]
 }
 
+// Stock Movement types (updated with new cost tracking fields)
 export interface StockMovement {
   id: string
   productId: string
   productName: string
   movementType: 'IN' | 'OUT' | 'ADJUSTMENT'
   quantity: number
+  unitPrice?: number       // NEW - buying/selling price per unit
+  totalCost?: number       // NEW - unitPrice * quantity
+  supplierId?: string      // NEW - for IN movements
   relatedOrderId?: string | null
   invoiceNumber?: number | null
   note: string
@@ -150,11 +154,12 @@ export enum FilterType {
 export interface DashboardMetrics {
   totalSales: number
   cogs: number
-  netProfit: number
+  grossProfit: number  // NEW - TotalSales - COGS
+  netProfit: number    // GrossProfit - OperatingExpenses
   totalExpenses: number
   productCount: number
   customerCount: number
-  currentCash: number
+  currentCash: number  // Updated calculation: InitialCash + TotalSales - TotalExpenses - TotalInventoryPurchases
 }
 
 export interface RecentOrder {
@@ -184,11 +189,51 @@ export interface PaginatedResponse<T> {
   pageSize: number
 }
 
-// Expense types
+// Paginated list responses
+export interface CustomerListResponse {
+  customers: Customer[]
+  currentPage: number
+  pageSize: number
+  totalPages: number
+  totalCount: number
+}
+
+export interface OrderListResponse {
+  orders: Order[]
+  currentPage: number
+  pageSize: number
+  totalPages: number
+  totalCount: number
+}
+
+export interface ProductListResponse {
+  products: Product[]
+  currentPage: number
+  pageSize: number
+  totalPages: number
+  totalCount: number
+}
+
+export interface NoteListResponse {
+  notes: Note[]
+  currentPage: number
+  pageSize: number
+  totalPages: number
+  totalCount: number
+}
+
+export interface StockMovementListResponse {
+  stockMovements: StockMovement[]
+  currentPage: number
+  pageSize: number
+  totalPages: number
+  totalCount: number
+}
+
+// Expense types (updated - removed productId, removed supplierId, added fixedAssetId)
 export interface Expense {
   id: string
-  productId?: string | null
-  supplierId?: string | null
+  fixedAssetId?: string | null  // NEW - replaces productId
   title: string
   category?: string | null
   amount: number
@@ -198,11 +243,14 @@ export interface Expense {
 export interface ExpensesResponse {
   expenses: Expense[]
   totalExpenses: number
+  currentPage: number
+  pageSize: number
+  totalPages: number
+  totalCount: number
 }
 
 export interface CreateExpenseRequest {
-  productId?: string | null
-  supplierId?: string | null
+  fixedAssetId?: string | null  // NEW - replaces productId
   title: string
   category?: string | null
   amount: number
@@ -210,8 +258,7 @@ export interface CreateExpenseRequest {
 
 export interface UpdateExpenseRequest {
   id: string
-  productId?: string | null
-  supplierId?: string | null
+  fixedAssetId?: string | null  // NEW - replaces productId
   title?: string
   category?: string | null
   amount?: number
@@ -264,4 +311,55 @@ export interface UpdateSupplierRequest {
   phone?: string
   email?: string
   address?: string
+}
+
+// Fixed Asset types
+export interface FixedAsset {
+  id: string
+  tenantId: string
+  name: string
+  category?: string | null
+  purchaseCost: number
+  purchaseDate: string
+  usefulLifeMonths: number
+  monthlyDepreciation: number
+  accumulatedDepreciation: number
+  currentBookValue: number
+  isActive: boolean
+  createdAt: string
+}
+
+export interface AssetDepreciation {
+  id: number
+  fixedAssetId: string
+  amount: number
+  month: number
+  year: number
+  createdAt: string
+}
+
+export interface CreateFixedAssetRequest {
+  name: string
+  category?: string | null
+  purchasePrice: number
+  purchaseDate: string
+  usefulLifeMonths: number
+}
+
+export interface UpdateFixedAssetRequest {
+  id: string
+  name: string
+  category?: string | null
+  purchaseCost: number
+  purchaseDate: string
+  usefulLifeMonths: number
+}
+
+export interface FixedAssetListResponse {
+  fixedAssets: FixedAsset[]
+  totalFixedAssets: number  // Sum of all purchase costs
+  currentPage: number
+  pageSize: number
+  totalPages: number
+  totalCount: number
 }

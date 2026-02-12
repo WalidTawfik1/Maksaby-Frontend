@@ -9,14 +9,14 @@ import { Label } from '@/components/ui/label'
 import { getDashboardData, getUserProfile } from '@/lib/api-client'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { translateApiMessage } from '@/lib/translations'
-import { LayoutDashboard, TrendingUp, Package, Users, ShoppingCart, User as UserIcon, Filter, X, Wallet, Receipt, Banknote } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, Package, Users, ShoppingCart, User as UserIcon, Filter, X, Wallet, Receipt, Banknote, TrendingDown } from 'lucide-react'
 import { FilterType } from '@/types'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import Image from 'next/image'
 
 export default function DashboardPage() {
-  const [filterType, setFilterType] = useState<FilterType | null>(null)
+  const [filterType, setFilterType] = useState<FilterType | null>(FilterType.ThisMonth)
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
@@ -218,7 +218,7 @@ export default function DashboardPage() {
                   </svg>
                 </div>
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity w-56 text-center z-50">
-                  النقد الأولي + المبيعات - المصروفات
+                  النقد الأولي + المبيعات - المصروفات - مشتريات المخزون
                   <div className="mt-1 pt-1 border-t border-border text-muted-foreground">
                     انتقل إلى الإعدادات لتعديل النقد الأولي
                   </div>
@@ -270,6 +270,22 @@ export default function DashboardPage() {
         </Card>
 
         <Card className="overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-cyan-500/10" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+            <CardTitle className="text-sm font-medium">إجمالي الربح</CardTitle>
+            <div className="p-2 bg-teal-500/10 rounded-lg">
+              <TrendingDown className="h-5 w-5 text-teal-600" />
+            </div>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+              {formatCurrency(stats?.grossProfit || 0)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">المبيعات - تكلفة البضاعة</p>
+          </CardContent>
+        </Card>
+
+        <Card className="overflow-hidden relative">
           <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
             <CardTitle className="text-sm font-medium">صافي الربح</CardTitle>
@@ -281,6 +297,7 @@ export default function DashboardPage() {
             <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
               {formatCurrency(stats?.netProfit || 0)}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">إجمالي الربح - المصروفات</p>
           </CardContent>
         </Card>
 

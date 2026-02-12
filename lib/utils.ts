@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatCurrency(amount: number): string {
   const currency = process.env.NEXT_PUBLIC_CURRENCY || 'ج.م'
-  return `${amount.toFixed(2)} ${currency}`
+  return `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`
 }
 
 export function formatDate(date: string | Date): string {

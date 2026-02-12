@@ -27,7 +27,7 @@ export function NoteFormDialog({ note, isOpen, onClose }: NoteFormDialogProps) {
     queryFn: () => getAllCustomers({ pageSize: 100 }),
   })
 
-  const customers = customersResponse?.data || []
+  const customers = customersResponse?.data?.customers || []
 
   useEffect(() => {
     if (note) {

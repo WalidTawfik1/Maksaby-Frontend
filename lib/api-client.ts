@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, ExpensesResponse, CreateExpenseRequest, UpdateExpenseRequest, Note, CreateNoteRequest, UpdateNoteRequest, UserProfile, UpdateProfileFormData, Supplier, CreateSupplierRequest, UpdateSupplierRequest } from '@/types'
+import { ApiResponse, Product, ProductFormData, Customer, CustomerFormData, StockMovement, FilterType, Order, CreateOrderRequest, DashboardData, Expense, ExpensesResponse, CreateExpenseRequest, UpdateExpenseRequest, Note, CreateNoteRequest, UpdateNoteRequest, UserProfile, UpdateProfileFormData, Supplier, CreateSupplierRequest, UpdateSupplierRequest, ProductListResponse, CustomerListResponse, OrderListResponse, StockMovementListResponse, NoteListResponse, FixedAsset, CreateFixedAssetRequest, UpdateFixedAssetRequest, FixedAssetListResponse } from '@/types'
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -57,7 +57,7 @@ interface GetAllProductsParams {
 export const getAllProducts = async (params: GetAllProductsParams = {}) => {
   const { pageNum = 1, pageSize = 50, searchTerm = '' } = params
   
-  const response = await apiClient.get<ApiResponse<Product[]>>('/Product/getallproducts', {
+  const response = await apiClient.get<ApiResponse<ProductListResponse>>('/Product/getallproducts', {
     params: {
       pagenum: pageNum,
       pagesize: pageSize,
@@ -175,7 +175,7 @@ interface GetAllCustomersParams {
 export const getAllCustomers = async (params: GetAllCustomersParams = {}) => {
   const { pageNum = 1, pageSize = 50, searchTerm = '' } = params
   
-  const response = await apiClient.get<ApiResponse<Customer[]>>('/Customer/getallcustomers', {
+  const response = await apiClient.get<ApiResponse<CustomerListResponse>>('/Customer/getallcustomers', {
     params: {
       pagenum: pageNum,
       pagesize: pageSize,
@@ -263,7 +263,7 @@ export const getAllStockMovements = async (params: GetAllStockMovementsParams = 
     FilterType = null, // null means get all
   } = params
 
-  const response = await apiClient.get<ApiResponse<StockMovement[]>>('/StockMovement/getallstockmovements', {
+  const response = await apiClient.get<ApiResponse<StockMovementListResponse>>('/StockMovement/getallstockmovements', {
     params: {
       pagenum,
       pagesize,
@@ -316,7 +316,7 @@ export const getAllOrders = async (params: GetAllOrdersParams = {}) => {
     endDate = null,
   } = params
   
-  const response = await apiClient.get<ApiResponse<Order[]>>('/Order/getallorders', {
+  const response = await apiClient.get<ApiResponse<OrderListResponse>>('/Order/getallorders', {
     params: {
       pagenum: pageNum,
       pagesize: pageSize,
@@ -345,7 +345,7 @@ export const getOrdersByCustomerId = async (
   pageNum: number = 1,
   pageSize: number = 10
 ) => {
-  const response = await apiClient.get<ApiResponse<Order[]>>(
+  const response = await apiClient.get<ApiResponse<OrderListResponse>>(
     `/Order/getorderbycustomerid/${customerId}`,
     {
       params: {
@@ -519,7 +519,7 @@ export const getAllNotes = async (params: GetAllNotesParams = {}) => {
     queryParams.isCompleted = params.isCompleted
   }
 
-  const response = await apiClient.get<ApiResponse<Note[]>>('/Note/getallnotes', {
+  const response = await apiClient.get<ApiResponse<NoteListResponse>>('/Note/getallnotes', {
     params: queryParams,
   })
   return response.data
@@ -683,5 +683,64 @@ export const updateSupplier = async (data: UpdateSupplierRequest) => {
  */
 export const deleteSupplier = async (supplierId: string) => {
   const response = await apiClient.delete<ApiResponse<boolean>>(`/Supplier/deletesupplier/${supplierId}`)
+  return response.data
+}
+
+// ==========================
+// Fixed Asset API Functions
+// ==========================
+
+interface GetAllFixedAssetsParams {
+  pageNum?: number
+  pageSize?: number
+  searchTerm?: string
+}
+
+/**
+ * Create a new fixed asset
+ */
+export const addFixedAsset = async (data: CreateFixedAssetRequest) => {
+  const response = await apiClient.post<ApiResponse<FixedAsset>>('/FixedAsset/addfixedasset', data)
+  return response.data
+}
+
+/**
+ * Get all fixed assets with pagination and search
+ */
+export const getAllFixedAssets = async (params: GetAllFixedAssetsParams = {}) => {
+  const { pageNum = 1, pageSize = 10, searchTerm = '' } = params
+  
+  const response = await apiClient.get<ApiResponse<FixedAssetListResponse>>('/FixedAsset/getallfixedassets', {
+    params: {
+      pagenum: pageNum,
+      pagesize: pageSize,
+      searchTerm: searchTerm,
+    },
+  })
+  
+  return response.data
+}
+
+/**
+ * Get a single fixed asset by ID
+ */
+export const getFixedAssetById = async (fixedAssetId: string) => {
+  const response = await apiClient.get<ApiResponse<FixedAsset>>(`/FixedAsset/${fixedAssetId}`)
+  return response.data
+}
+
+/**
+ * Update an existing fixed asset
+ */
+export const updateFixedAsset = async (data: UpdateFixedAssetRequest) => {
+  const response = await apiClient.patch<ApiResponse<boolean>>('/FixedAsset/updatefixedasset', data)
+  return response.data
+}
+
+/**
+ * Delete a fixed asset
+ */
+export const deleteFixedAsset = async (fixedAssetId: string) => {
+  const response = await apiClient.delete<ApiResponse<boolean>>(`/FixedAsset/${fixedAssetId}`)
   return response.data
 }

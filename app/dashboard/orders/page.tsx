@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, ShoppingCart, Eye, Printer, X, Filter, Calendar, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, ShoppingCart, Eye, Printer, X, Filter, Calendar, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -22,17 +22,18 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [isLoadingDetails, setIsLoadingDetails] = useState(false)
-  const [filterType, setFilterType] = useState<FilterType | null>(null)
+  const [filterType, setFilterType] = useState<FilterType | null>(FilterType.ThisMonth)
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
+  const [pageInput, setPageInput] = useState('1')
   const [isOrderFormOpen, setIsOrderFormOpen] = useState(false)
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
-  const { data: orders, isLoading, refetch } = useQuery({
+  const { data: ordersResponse, isLoading, refetch } = useQuery({
     queryKey: ['orders', currentPage, pageSize, filterType, startDate, endDate],
     queryFn: async () => {
       try {
@@ -49,15 +50,19 @@ export default function OrdersPage() {
         } else {
           const errorMsg = translateApiMessage(response.message)
           toast.error(errorMsg)
-          return []
+          return null
         }
       } catch (error: any) {
         const errorMsg = error.response?.data?.message || 'حدث خطأ أثناء تحميل الطلبات'
         toast.error(translateApiMessage(errorMsg))
-        return []
+        return null
       }
     },
   })
+
+  const orders = ordersResponse?.orders || []
+  const totalPages = ordersResponse?.totalPages || 1
+  const totalCount = ordersResponse?.totalCount || 0
 
   const getFilterTypeLabel = (type: FilterType | null) => {
     if (type === null) return 'الكل'
@@ -304,6 +309,7 @@ export default function OrdersPage() {
                   onClick={() => {
                     setFilterType(null)
                     setCurrentPage(1)
+                    setPageInput('1')
                   }}
                 >
                   الكل
@@ -314,6 +320,7 @@ export default function OrdersPage() {
                   onClick={() => {
                     setFilterType(FilterType.Today)
                     setCurrentPage(1)
+                    setPageInput('1')
                   }}
                 >
                   اليوم
@@ -324,6 +331,7 @@ export default function OrdersPage() {
                   onClick={() => {
                     setFilterType(FilterType.ThisWeek)
                     setCurrentPage(1)
+                    setPageInput('1')
                   }}
                 >
                   هذا الأسبوع
@@ -334,6 +342,7 @@ export default function OrdersPage() {
                   onClick={() => {
                     setFilterType(FilterType.ThisMonth)
                     setCurrentPage(1)
+                    setPageInput('1')
                   }}
                 >
                   هذا الشهر
@@ -344,6 +353,7 @@ export default function OrdersPage() {
                   onClick={() => {
                     setFilterType(FilterType.Custom)
                     setCurrentPage(1)
+                    setPageInput('1')
                   }}
                 >
                   مخصص
@@ -477,28 +487,82 @@ export default function OrdersPage() {
 
       {/* Pagination */}
       {orders && orders.length > 0 && (
-        <div className="flex items-center justify-between pt-4">
-          <div className="text-sm text-muted-foreground">
-            الصفحة {currentPage}
-          </div>
-          <div className="flex gap-2">
+        <div className="flex items-center justify-center pt-4">
+          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => {
+                setCurrentPage(1)
+                setPageInput('1')
+              }}
               disabled={currentPage === 1}
+              className="h-8 w-8 p-0"
             >
-              <ChevronRight className="h-4 w-4" />
-              السابق
+              <ChevronsRight className="h-4 w-4" />
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => setCurrentPage(p => p + 1)}
-              disabled={orders.length < pageSize}
+              onClick={() => {
+                const newPage = Math.max(1, currentPage - 1)
+                setCurrentPage(newPage)
+                setPageInput(newPage.toString())
+              }}
+              disabled={currentPage === 1}
+              className="h-8 px-3"
+            >
+              <ChevronRight className="h-4 w-4 ml-1" />
+              السابق
+            </Button>
+            <div className="flex items-center gap-2 px-2">
+              <span className="text-sm text-muted-foreground">صفحة</span>
+              <Input
+                type="number"
+                min="1"
+                max={totalPages}
+                value={pageInput}
+                onChange={(e) => setPageInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const page = parseInt(pageInput)
+                    if (page >= 1 && page <= totalPages) {
+                      setCurrentPage(page)
+                    } else {
+                      setPageInput(currentPage.toString())
+                    }
+                  }
+                }}
+                onBlur={() => setPageInput(currentPage.toString())}
+                className="w-20 h-8 text-center"
+              />
+              <span className="text-sm text-muted-foreground">من {totalPages}</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const newPage = Math.min(totalPages, currentPage + 1)
+                setCurrentPage(newPage)
+                setPageInput(newPage.toString())
+              }}
+              disabled={currentPage >= totalPages}
+              className="h-8 px-3"
             >
               التالي
               <ChevronLeft className="h-4 w-4 mr-1" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setCurrentPage(totalPages)
+                setPageInput(totalPages.toString())
+              }}
+              disabled={currentPage === totalPages}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronsLeft className="h-4 w-4" />
             </Button>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Package2, TrendingDown, TrendingUp, ArrowUpCircle, ArrowDownCircle, RefreshCw, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
+import { Package2, TrendingDown, TrendingUp, ArrowUpCircle, ArrowDownCircle, RefreshCw, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Filter } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,10 +14,18 @@ import { StockMovement, FilterType, Product } from '@/types'
 export default function StockPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize] = useState(20)
-  const [filterType, setFilterType] = useState<FilterType | null>(null)
+  const [filterType, setFilterType] = useState<FilterType | null>(FilterType.ThisMonth)
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
+  const [movementTypeFilter, setMovementTypeFilter] = useState<'ALL' | 'IN' | 'OUT'>('ALL')
+  const [lowStockPage, setLowStockPage] = useState(1)
+  const [lowStockPageSize] = useState(6)
+  const [currentStockPage, setCurrentStockPage] = useState(1)
+  const [currentStockPageSize] = useState(10)
+  const [lowStockPageInput, setLowStockPageInput] = useState('1')
+  const [currentStockPageInput, setCurrentStockPageInput] = useState('1')
+  const [movementsPageInput, setMovementsPageInput] = useState('1')
 
   const { data: productsResponse, isLoading: loadingProducts } = useQuery({
     queryKey: ['products-stock'],
@@ -39,10 +47,31 @@ export default function StockPage() {
     }),
   })
 
-  const movements = movementsResponse?.data || []
-  const lowStockProducts = allProducts.filter((p) => p.stock <= 2)
+  const movements = movementsResponse?.data?.stockMovements || []
+  const totalPages = movementsResponse?.data?.totalPages || 1
+  const totalMovementsCount = movementsResponse?.data?.totalCount || 0
+  const lowStockProducts = allProducts.filter((p) => p.stock <= 2 && p.stock > 0)
   const totalProducts = allProducts.length
   const totalStockValue = allProducts.reduce((sum, p) => sum + (p.stock * p.buyingPrice), 0)
+  
+  // Pagination for low stock products
+  const lowStockTotalPages = Math.ceil(lowStockProducts.length / lowStockPageSize)
+  const paginatedLowStock = lowStockProducts.slice(
+    (lowStockPage - 1) * lowStockPageSize,
+    lowStockPage * lowStockPageSize
+  )
+  
+  // Pagination for current stock
+  const currentStockTotalPages = Math.ceil(products.length / currentStockPageSize)
+  const paginatedCurrentStock = products.slice(
+    (currentStockPage - 1) * currentStockPageSize,
+    currentStockPage * currentStockPageSize
+  )
+  
+  // Filter movements by type
+  const filteredMovements = movementTypeFilter === 'ALL' 
+    ? movements 
+    : movements.filter(m => m.movementType === movementTypeFilter)
 
   const getMovementIcon = (type: string) => {
     if (type === 'IN') return <ArrowUpCircle className="h-4 w-4 text-green-600" />
@@ -128,7 +157,7 @@ export default function StockPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-              {lowStockProducts.map((product) => (
+              {paginatedLowStock.map((product) => (
                 <div key={product.id} className="flex items-center justify-between p-3 bg-white dark:bg-gray-900 rounded-lg border">
                   <div>
                     <p className="font-medium">{product.name}</p>
@@ -139,6 +168,87 @@ export default function StockPage() {
                 </div>
               ))}
             </div>
+            {lowStockProducts.length > lowStockPageSize && (
+              <div className="flex items-center justify-center mt-4">
+                <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setLowStockPage(1)
+                      setLowStockPageInput('1')
+                    }}
+                    disabled={lowStockPage === 1}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronsRight className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const newPage = Math.max(1, lowStockPage - 1)
+                      setLowStockPage(newPage)
+                      setLowStockPageInput(newPage.toString())
+                    }}
+                    disabled={lowStockPage === 1}
+                    className="h-8 px-3"
+                  >
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                    السابق
+                  </Button>
+                  <div className="flex items-center gap-2 px-2">
+                    <span className="text-sm text-muted-foreground">صفحة</span>
+                    <Input
+                      type="number"
+                      min="1"
+                      max={lowStockTotalPages}
+                      value={lowStockPageInput}
+                      onChange={(e) => setLowStockPageInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const page = parseInt(lowStockPageInput)
+                          if (page >= 1 && page <= lowStockTotalPages) {
+                            setLowStockPage(page)
+                          } else {
+                            setLowStockPageInput(lowStockPage.toString())
+                          }
+                        }
+                      }}
+                      onBlur={() => setLowStockPageInput(lowStockPage.toString())}
+                      className="w-16 h-8 text-center"
+                    />
+                    <span className="text-sm text-muted-foreground">من {lowStockTotalPages}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const newPage = Math.min(lowStockTotalPages, lowStockPage + 1)
+                      setLowStockPage(newPage)
+                      setLowStockPageInput(newPage.toString())
+                    }}
+                    disabled={lowStockPage >= lowStockTotalPages}
+                    className="h-8 px-3"
+                  >
+                    التالي
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setLowStockPage(lowStockTotalPages)
+                      setLowStockPageInput(lowStockTotalPages.toString())
+                    }}
+                    disabled={lowStockPage === lowStockTotalPages}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronsLeft className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -159,7 +269,7 @@ export default function StockPage() {
                 {products.length === 0 ? (
                   <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">لا توجد منتجات في المخزون</td></tr>
                 ) : (
-                  products.map((product) => (
+                  paginatedCurrentStock.map((product) => (
                     <tr key={product.id} className="hover:bg-muted/50">
                       <td className="px-4 py-3 font-medium">{product.name}</td>
                       <td className="px-4 py-3"><span className={product.stock <= 5 ? 'text-red-600 font-semibold' : ''}>{product.stock}</span></td>
@@ -178,6 +288,87 @@ export default function StockPage() {
               </tbody>
             </table>
           </div></div>
+          {products.length > currentStockPageSize && (
+            <div className="flex items-center justify-center mt-4">
+              <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setCurrentStockPage(1)
+                    setCurrentStockPageInput('1')
+                  }}
+                  disabled={currentStockPage === 1}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const newPage = Math.max(1, currentStockPage - 1)
+                    setCurrentStockPage(newPage)
+                    setCurrentStockPageInput(newPage.toString())
+                  }}
+                  disabled={currentStockPage === 1}
+                  className="h-8 px-3"
+                >
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                  السابق
+                </Button>
+                <div className="flex items-center gap-2 px-2">
+                  <span className="text-sm text-muted-foreground">صفحة</span>
+                  <Input
+                    type="number"
+                    min="1"
+                    max={currentStockTotalPages}
+                    value={currentStockPageInput}
+                    onChange={(e) => setCurrentStockPageInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const page = parseInt(currentStockPageInput)
+                        if (page >= 1 && page <= currentStockTotalPages) {
+                          setCurrentStockPage(page)
+                        } else {
+                          setCurrentStockPageInput(currentStockPage.toString())
+                        }
+                      }
+                    }}
+                    onBlur={() => setCurrentStockPageInput(currentStockPage.toString())}
+                    className="w-20 h-8 text-center"
+                  />
+                  <span className="text-sm text-muted-foreground">من {currentStockTotalPages}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const newPage = Math.min(currentStockTotalPages, currentStockPage + 1)
+                    setCurrentStockPage(newPage)
+                    setCurrentStockPageInput(newPage.toString())
+                  }}
+                  disabled={currentStockPage >= currentStockTotalPages}
+                  className="h-8 px-3"
+                >
+                  التالي
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setCurrentStockPage(currentStockTotalPages)
+                    setCurrentStockPageInput(currentStockTotalPages.toString())
+                  }}
+                  disabled={currentStockPage === currentStockTotalPages}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -185,18 +376,67 @@ export default function StockPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>حركة المخزون</CardTitle>
-            <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
-              <Filter className="h-4 w-4 ml-2" />تصفية
-            </Button>
+            <div className="flex gap-2">
+              <div className="flex gap-1 border rounded-md p-1">
+                <Button
+                  variant={movementTypeFilter === 'ALL' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setMovementTypeFilter('ALL')}
+                >
+                  الكل
+                </Button>
+                <Button
+                  variant={movementTypeFilter === 'IN' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setMovementTypeFilter('IN')}
+                  className={movementTypeFilter === 'IN' ? 'bg-green-600 hover:bg-green-700' : ''}
+                >
+                  <ArrowUpCircle className="h-4 w-4 ml-1" />
+                  إدخال
+                </Button>
+                <Button
+                  variant={movementTypeFilter === 'OUT' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setMovementTypeFilter('OUT')}
+                  className={movementTypeFilter === 'OUT' ? 'bg-red-600 hover:bg-red-700' : ''}
+                >
+                  <ArrowDownCircle className="h-4 w-4 ml-1" />
+                  إخراج
+                </Button>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
+                <Filter className="h-4 w-4 ml-2" />تصفية
+              </Button>
+            </div>
           </div>
           {showFilters && (
             <div className="mt-4 p-4 border rounded-lg space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-                <Button variant={filterType === null ? 'default' : 'outline'} size="sm" onClick={() => setFilterType(null)}>الكل</Button>
-                <Button variant={filterType === FilterType.Today ? 'default' : 'outline'} size="sm" onClick={() => setFilterType(FilterType.Today)}>اليوم</Button>
-                <Button variant={filterType === FilterType.ThisWeek ? 'default' : 'outline'} size="sm" onClick={() => setFilterType(FilterType.ThisWeek)}>هذا الأسبوع</Button>
-                <Button variant={filterType === FilterType.ThisMonth ? 'default' : 'outline'} size="sm" onClick={() => setFilterType(FilterType.ThisMonth)}>هذا الشهر</Button>
-                <Button variant={filterType === FilterType.Custom ? 'default' : 'outline'} size="sm" onClick={() => setFilterType(FilterType.Custom)}>مخصص</Button>
+                <Button variant={filterType === null ? 'default' : 'outline'} size="sm" onClick={() => {
+                  setFilterType(null)
+                  setCurrentPage(1)
+                  setMovementsPageInput('1')
+                }}>الكل</Button>
+                <Button variant={filterType === FilterType.Today ? 'default' : 'outline'} size="sm" onClick={() => {
+                  setFilterType(FilterType.Today)
+                  setCurrentPage(1)
+                  setMovementsPageInput('1')
+                }}>اليوم</Button>
+                <Button variant={filterType === FilterType.ThisWeek ? 'default' : 'outline'} size="sm" onClick={() => {
+                  setFilterType(FilterType.ThisWeek)
+                  setCurrentPage(1)
+                  setMovementsPageInput('1')
+                }}>هذا الأسبوع</Button>
+                <Button variant={filterType === FilterType.ThisMonth ? 'default' : 'outline'} size="sm" onClick={() => {
+                  setFilterType(FilterType.ThisMonth)
+                  setCurrentPage(1)
+                  setMovementsPageInput('1')
+                }}>هذا الشهر</Button>
+                <Button variant={filterType === FilterType.Custom ? 'default' : 'outline'} size="sm" onClick={() => {
+                  setFilterType(FilterType.Custom)
+                  setCurrentPage(1)
+                  setMovementsPageInput('1')
+                }}>مخصص</Button>
               </div>
               {filterType === FilterType.Custom && (
                 <div className="grid gap-4 md:grid-cols-2">
@@ -221,15 +461,17 @@ export default function StockPage() {
                 <th className="px-4 py-3 text-right text-sm font-medium">النوع</th>
                 <th className="px-4 py-3 text-right text-sm font-medium">المنتج</th>
                 <th className="px-4 py-3 text-right text-sm font-medium">الكمية</th>
+                <th className="px-4 py-3 text-right text-sm font-medium">سعر الوحدة</th>
+                <th className="px-4 py-3 text-right text-sm font-medium">التكلفة الإجمالية</th>
                 <th className="px-4 py-3 text-right text-sm font-medium">رقم الفاتورة</th>
                 <th className="px-4 py-3 text-right text-sm font-medium">الملاحظة</th>
                 <th className="px-4 py-3 text-right text-sm font-medium">التاريخ</th>
               </tr></thead>
               <tbody className="divide-y">
-                {movements.length === 0 ? (
-                  <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">لا توجد حركات مخزون</td></tr>
+                {filteredMovements.length === 0 ? (
+                  <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">لا توجد حركات مخزون</td></tr>
                 ) : (
-                  movements.map((movement) => (
+                  filteredMovements.map((movement) => (
                     <tr key={movement.id} className="hover:bg-muted/50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
@@ -246,6 +488,20 @@ export default function StockPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
+                        {movement.unitPrice !== null && movement.unitPrice !== undefined ? (
+                          <span className="text-sm">{formatCurrency(movement.unitPrice)}</span>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">-</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {movement.totalCost !== null && movement.totalCost !== undefined ? (
+                          <span className="text-sm font-medium">{formatCurrency(movement.totalCost)}</span>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">-</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
                         {movement.invoiceNumber !== null ? (
                           <span className="text-sm">{movement.invoiceNumber}</span>
                         ) : (
@@ -260,15 +516,83 @@ export default function StockPage() {
               </tbody>
             </table>
           </div></div>
-          {movements.length > 0 && (
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-muted-foreground">الصفحة {currentPage}</div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
-                  <ChevronRight className="h-4 w-4" />السابق
+          {filteredMovements.length > 0 && (
+            <div className="flex items-center justify-center mt-4">
+              <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setCurrentPage(1)
+                    setMovementsPageInput('1')
+                  }}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronsRight className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p + 1)} disabled={movements.length < pageSize}>
-                  التالي<ChevronLeft className="h-4 w-4 mr-1" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const newPage = Math.max(1, currentPage - 1)
+                    setCurrentPage(newPage)
+                    setMovementsPageInput(newPage.toString())
+                  }}
+                  disabled={currentPage === 1}
+                  className="h-8 px-3"
+                >
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                  السابق
+                </Button>
+                <div className="flex items-center gap-2 px-2">
+                  <span className="text-sm text-muted-foreground">صفحة</span>
+                  <Input
+                    type="number"
+                    min="1"
+                    max={totalPages}
+                    value={movementsPageInput}
+                    onChange={(e) => setMovementsPageInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const page = parseInt(movementsPageInput)
+                        if (page >= 1 && page <= totalPages) {
+                          setCurrentPage(page)
+                        } else {
+                          setMovementsPageInput(currentPage.toString())
+                        }
+                      }
+                    }}
+                    onBlur={() => setMovementsPageInput(currentPage.toString())}
+                    className="w-20 h-8 text-center"
+                  />
+                  <span className="text-sm text-muted-foreground">من {totalPages}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const newPage = Math.min(totalPages, currentPage + 1)
+                    setCurrentPage(newPage)
+                    setMovementsPageInput(newPage.toString())
+                  }}
+                  disabled={currentPage >= totalPages}
+                  className="h-8 px-3"
+                >
+                  التالي
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setCurrentPage(totalPages)
+                    setMovementsPageInput(totalPages.toString())
+                  }}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronsLeft className="h-4 w-4" />
                 </Button>
               </div>
             </div>
