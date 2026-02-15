@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Building2, Search, Edit, Trash2, TrendingDown, CheckCircle, XCircle, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { Plus, Building2, Search, Edit, Trash2, TrendingDown, CheckCircle, XCircle, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -130,6 +130,21 @@ export default function FixedAssetsPage() {
           إضافة أصل ثابت
         </Button>
       </div>
+
+      {/* Automated Service Info */}
+      <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
+        <CardContent className="flex items-start gap-3 pt-4">
+          <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+              الخدمة التلقائية للاستهلاك
+            </p>
+            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+              يتم احتساب وإضافة الاستهلاك الشهري للأصول النشطة تلقائياً في اليوم الأول من كل شهر
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Summary Stats */}
       <div className="grid gap-4 md:grid-cols-3">
