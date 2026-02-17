@@ -6,7 +6,7 @@ import { X, Plus, Trash2, Loader2, ShoppingCart, User, Tag, FileText, Package, R
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { createOrder, getAllCustomers, getAllProductsWithoutPagination } from '@/lib/api-client'
+import { createOrder, getAllCustomersWithoutPagination, getAllProductsWithoutPagination } from '@/lib/api-client'
 import { CreateOrderRequest, CreateOrderItem } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import { translateApiMessage } from '@/lib/translations'
@@ -40,10 +40,11 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
   const customerDropdownRef = useRef<HTMLDivElement>(null)
   const productDropdownRef = useRef<HTMLDivElement>(null)
 
-  // Fetch customers
+  // Fetch customers without pagination for better UX
   const { data: customersResponse } = useQuery({
-    queryKey: ['customers'],
-    queryFn: () => getAllCustomers({ pageSize: 100 }),
+    queryKey: ['customers-all'],
+    queryFn: getAllCustomersWithoutPagination,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   })
 
   // Fetch products
@@ -52,7 +53,7 @@ export function OrderFormDialog({ isOpen, onClose }: OrderFormDialogProps) {
     queryFn: () => getAllProductsWithoutPagination(),
   })
 
-  const customers = customersResponse?.data?.customers || []
+  const customers = customersResponse?.data || []
   const products = productsResponse?.data || []
 
   // Filter customers based on search

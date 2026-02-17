@@ -187,6 +187,14 @@ export const getAllCustomers = async (params: GetAllCustomersParams = {}) => {
 }
 
 /**
+ * Get all customers without pagination (for dropdowns/selection)
+ */
+export const getAllCustomersWithoutPagination = async () => {
+  const response = await apiClient.get<ApiResponse<Customer[]>>('/v1/Customer/getallcustomerswithoutpagination')
+  return response.data
+}
+
+/**
  * Get a single customer by ID
  */
 export const getCustomerById = async (customerId: string) => {
