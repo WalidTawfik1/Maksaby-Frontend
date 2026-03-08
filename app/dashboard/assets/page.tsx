@@ -140,7 +140,7 @@ export default function FixedAssetsPage() {
               الخدمة التلقائية للاستهلاك
             </p>
             <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-              يتم احتساب وإضافة الاستهلاك الشهري للأصول النشطة تلقائياً في اليوم الأول من كل شهر
+              يتم احتساب وإضافة الاستهلاك الشهري للأصول النشطة بشكل تلقائي.
             </p>
           </div>
         </CardContent>
