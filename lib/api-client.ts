@@ -285,6 +285,39 @@ export const getAllStockMovements = async (params: GetAllStockMovementsParams = 
   return response.data
 }
 
+/**
+ * Get stock movements by supplier ID with time filter
+ */
+export const getAllStockMovementsBySupplierId = async (
+  supplierId: string,
+  timeFilter: FilterType = FilterType.ThisMonth,
+  startDate: string | null = null,
+  endDate: string | null = null
+) => {
+  const queryParams: any = {
+    supplierId,
+    FilterType: timeFilter,
+  }
+
+  if (timeFilter === FilterType.Custom) {
+    if (startDate) {
+      queryParams.StartDate = startDate
+    }
+    if (endDate) {
+      queryParams.EndDate = endDate
+    }
+  }
+
+  const response = await apiClient.get<ApiResponse<StockMovement[]>>(
+    '/v1/StockMovement/getallstockmovementsbysupplierid',
+    {
+      params: queryParams,
+    }
+  )
+
+  return response.data
+}
+
 // ==========================
 // Order API Functions
 // ==========================

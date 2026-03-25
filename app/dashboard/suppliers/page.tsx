@@ -2,15 +2,16 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Users, Search, Edit, Trash2, X, Receipt } from 'lucide-react'
+import { Plus, Users, Search, Edit, Trash2, X, Receipt, Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { SupplierFormDialog } from '@/components/supplier-form-dialog'
 import { ConfirmDialog } from '@/components/confirm-dialog'
-import { getAllSuppliers, deleteSupplier as deleteSupplierApi, getExpensesBySupplier } from '@/lib/api-client'
+import { getAllSuppliers, deleteSupplier as deleteSupplierApi, getAllStockMovementsBySupplierId } from '@/lib/api-client'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
-import { Supplier } from '@/types'
+import { FilterType, Supplier } from '@/types'
 import toast from 'react-hot-toast'
 import { translateApiMessage } from '@/lib/translations'
 
@@ -22,6 +23,9 @@ export default function SuppliersPage() {
   const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(null)
   const [isExpensesDialogOpen, setIsExpensesDialogOpen] = useState(false)
   const [supplierForExpenses, setSupplierForExpenses] = useState<Supplier | null>(null)
+  const [expensesTimeFilter, setExpensesTimeFilter] = useState<FilterType>(FilterType.ThisMonth)
+  const [expensesStartDate, setExpensesStartDate] = useState<string>('')
+  const [expensesEndDate, setExpensesEndDate] = useState<string>('')
   const queryClient = useQueryClient()
 
   const { data: suppliersResponse, isLoading } = useQuery({
@@ -33,16 +37,37 @@ export default function SuppliersPage() {
 
   const suppliers = suppliersResponse?.data || []
 
-  // Query for supplier expenses
-  const { data: expensesResponse, isLoading: isLoadingExpenses } = useQuery({
-    queryKey: ['supplier-expenses', supplierForExpenses?.id],
+  // Query for supplier purchase movements
+  const { data: supplierMovements = [], isLoading: isLoadingExpenses } = useQuery({
+    queryKey: ['supplier-stock-movements', supplierForExpenses?.id, expensesTimeFilter, expensesStartDate, expensesEndDate],
     queryFn: async () => {
-      if (!supplierForExpenses?.id) return null
-      const response = await getExpensesBySupplier(supplierForExpenses.id, 1, 100)
-      return response.isSuccess ? response.data : null
+      if (!supplierForExpenses?.id) return []
+      const response = await getAllStockMovementsBySupplierId(
+        supplierForExpenses.id,
+        expensesTimeFilter,
+        expensesTimeFilter === FilterType.Custom ? expensesStartDate || null : null,
+        expensesTimeFilter === FilterType.Custom ? expensesEndDate || null : null
+      )
+      if (!response.isSuccess || !response.data) return []
+
+      // Keep only purchase entries to match "products bought from supplier".
+      return response.data.filter((movement) => movement.movementType === 'IN')
     },
     enabled: !!supplierForExpenses?.id && isExpensesDialogOpen,
   })
+
+  const totalSupplierPurchases = supplierMovements.reduce((sum, movement) => {
+    if (typeof movement.totalCost === 'number') return sum + movement.totalCost
+    return sum + (movement.unitPrice || 0) * movement.quantity
+  }, 0)
+
+  const getFilterTypeLabel = (type: FilterType) => {
+    if (type === FilterType.Today) return 'اليوم'
+    if (type === FilterType.ThisWeek) return 'هذا الأسبوع'
+    if (type === FilterType.ThisMonth) return 'هذا الشهر'
+    if (type === FilterType.Custom) return 'مخصص'
+    return 'هذا الشهر'
+  }
 
   // Filter suppliers based on search
   const filteredSuppliers = suppliers.filter((supplier) => {
@@ -105,6 +130,9 @@ export default function SuppliersPage() {
 
   const handleViewExpenses = (supplier: Supplier) => {
     setSupplierForExpenses(supplier)
+    setExpensesTimeFilter(FilterType.ThisMonth)
+    setExpensesStartDate('')
+    setExpensesEndDate('')
     setIsExpensesDialogOpen(true)
   }
 
@@ -283,48 +311,116 @@ export default function SuppliersPage() {
 
             {/* Content */}
             <div className="p-6">
+              <div className="mb-6 rounded-lg border p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">تصفية حسب الفترة الزمنية</span>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-4">
+                  <Button
+                    variant={expensesTimeFilter === FilterType.Today ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setExpensesTimeFilter(FilterType.Today)}
+                  >
+                    اليوم
+                  </Button>
+                  <Button
+                    variant={expensesTimeFilter === FilterType.ThisWeek ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setExpensesTimeFilter(FilterType.ThisWeek)}
+                  >
+                    هذا الأسبوع
+                  </Button>
+                  <Button
+                    variant={expensesTimeFilter === FilterType.ThisMonth ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setExpensesTimeFilter(FilterType.ThisMonth)}
+                  >
+                    هذا الشهر
+                  </Button>
+                  <Button
+                    variant={expensesTimeFilter === FilterType.Custom ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setExpensesTimeFilter(FilterType.Custom)}
+                  >
+                    مخصص
+                  </Button>
+                </div>
+                {expensesTimeFilter === FilterType.Custom && (
+                  <div className="grid gap-3 md:grid-cols-2 mt-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="supplierStartDate">من تاريخ</Label>
+                      <Input
+                        id="supplierStartDate"
+                        type="date"
+                        value={expensesStartDate}
+                        onChange={(e) => setExpensesStartDate(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="supplierEndDate">إلى تاريخ</Label>
+                      <Input
+                        id="supplierEndDate"
+                        type="date"
+                        value={expensesEndDate}
+                        onChange={(e) => setExpensesEndDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+                <div className="text-sm text-muted-foreground mt-3">
+                  الفلتر الحالي: <span className="font-semibold">{getFilterTypeLabel(expensesTimeFilter)}</span>
+                </div>
+              </div>
+
               {isLoadingExpenses ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                   <p className="mt-4 text-muted-foreground">جاري التحميل...</p>
                 </div>
-              ) : expensesResponse?.expenses && expensesResponse.expenses.length > 0 ? (
+              ) : supplierMovements.length > 0 ? (
                 <>
                   {/* Summary */}
                   <div className="mb-6 p-4 bg-primary/10 rounded-lg">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">إجمالي المشتريات:</span>
                       <span className="text-2xl font-bold text-primary">
-                        {formatCurrency(expensesResponse.totalExpenses)}
+                        {formatCurrency(totalSupplierPurchases)}
                       </span>
                     </div>
                     <div className="text-sm text-muted-foreground mt-1">
-                      {expensesResponse.expenses.length} عملية شراء
+                      {supplierMovements.length} عملية شراء
                     </div>
                   </div>
 
                   {/* Expenses List */}
                   <div className="space-y-3">
-                    {expensesResponse.expenses.map((expense) => (
+                    {supplierMovements.map((movement) => (
                       <div
-                        key={expense.id}
+                        key={movement.id}
                         className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="font-semibold">{expense.title}</h3>
-                            {expense.category && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {expense.category}
-                              </p>
+                            <h3 className="font-semibold">{movement.productName}</h3>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              الكمية: {movement.quantity}
+                              {movement.unitPrice ? ` | سعر الوحدة: ${formatCurrency(movement.unitPrice)}` : ''}
+                            </p>
+                            {movement.note && (
+                              <p className="text-sm text-muted-foreground mt-1">{movement.note}</p>
                             )}
                             <p className="text-xs text-muted-foreground mt-2">
-                              {formatDateTime(expense.createdAt)}
+                              {formatDateTime(movement.createdAt)}
                             </p>
                           </div>
                           <div className="text-left">
                             <p className="text-xl font-bold text-orange-600">
-                              {formatCurrency(expense.amount)}
+                              {formatCurrency(
+                                typeof movement.totalCost === 'number'
+                                  ? movement.totalCost
+                                  : (movement.unitPrice || 0) * movement.quantity
+                              )}
                             </p>
                           </div>
                         </div>
@@ -335,7 +431,7 @@ export default function SuppliersPage() {
               ) : (
                 <div className="text-center py-12">
                   <Receipt className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">لا توجد مشتريات من هذا المورد</p>
+                  <p className="text-muted-foreground">لا توجد مشتريات من هذا المورد في الفترة المحددة</p>
                 </div>
               )}
             </div>
